@@ -369,6 +369,24 @@ let shuffledOptions = [];
 let current = 0;
 let answers = [];
 
+window.addEventListener('DOMContentLoaded', function() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#result=')) {
+    const pct = parseInt(hash.replace('#result=', ''));
+    if (!isNaN(pct) && pct >= 0 && pct <= 100) {
+      document.getElementById('intro').classList.remove('active');
+      document.getElementById('result').classList.add('active');
+      const tierIndex = RESULT_TIERS.findIndex(t => pct >= t.min && pct <= t.max);
+      const tier = RESULT_TIERS[tierIndex];
+      document.getElementById('resultTitle').textContent = tier.title;
+      document.getElementById('resultSub').textContent = tier.sub;
+      document.getElementById('resultPct').textContent = pct + '%';
+      document.getElementById('catBreakdown').innerHTML =
+        '<p style="font-size:14px;color:var(--ink-dim);text-align:center;line-height:1.8;padding:8px 0;">친구의 결과예요!<br>나는 어떤 머니 마인드인지 확인해볼까요?</p>';
+    }
+  }
+});
+
 function startQuiz() {
   shuffledOptions = QUESTIONS_RAW.map(() => Math.random() > 0.5);
   current = 0;
@@ -413,7 +431,7 @@ function shareResult() {
   const title = document.getElementById('resultTitle').textContent;
   const sub = document.getElementById('resultSub').textContent;
   const pct = document.getElementById('resultPct').textContent;
-  const url = 'https://dajung53-alt.github.io/money-mindset-test/';
+  const url = 'https://dajung53-alt.github.io/money-mindset-test/' + window.location.hash;
   const text = '나의 부자 마인드 지수 ' + pct + '\n"' + title + '"\n' + sub + '\n\n나도 테스트해보기 👉 ' + url;
   if (navigator.share) {
     navigator.share({ title: '부자 마인드 자가진단', text: text, url: url });
@@ -438,6 +456,7 @@ function showResult() {
   document.getElementById('resultTitle').textContent = tier.title;
   document.getElementById('resultSub').textContent = tier.sub;
   document.getElementById('resultPct').textContent = pct + '%';
+  history.replaceState(null, null, '#result=' + pct);
 
   const cats = {};
   QUESTIONS_RAW.forEach((q, i) => {
