@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>부자 마인드 자가진단</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Space+Grotesk:wght@500;700&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #FAF8F2;
+    --bg-2: #F2EEE4;
+    --card: #FFFFFF;
+    --ink: #1C2B20;
+    --ink-dim: #4D5E50;
+    --ink-faint: #8E9E90;
+    --gold: #B8892B;
+    --gold-dim: #C9A44A;
+    --teal: #1E8A6A;
+    --line: rgba(28,43,32,0.1);
+    --radius: 18px;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
+    background: radial-gradient(ellipse at top, rgba(184,137,43,0.1), transparent 55%), var(--bg);
+  }
+  .stage {
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 44px 20px 64px;
+    display: flex;
+    flex-direction: column;
+  }
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ── INTRO ── */
+  #intro { justify-content: center; align-items: center; gap: 22px; text-align: center; }
+  #intro h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.45;
+  }
+  .intro-icon-row { display: flex; justify-content: center; gap: 12px; margin: 2px 0; }
+  .intro-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold-dim);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--gold);
+  }
+  .sub { color: var(--ink-dim); font-size: 15px; line-height: 1.75; max-width: 340px; }
+  .meta-row {
+    display: flex; justify-content: center; gap: 18px;
+    font-size: 12px; color: var(--ink-faint);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .meta-row span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold-dim); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600; font-size: 16px;
+    padding: 16px 28px; border-radius: 999px;
+    border: none; cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    width: 100%;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--gold); color: #FFFFFF; }
+  .btn-ghost { background: transparent; color: var(--ink-dim); border: 1px solid var(--line); }
+
+  /* ── QUIZ ── */
+  #quiz { gap: 20px; }
+  .progress-row { display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.35s ease; }
+  .progress-num { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--ink-faint); white-space: nowrap; }
+  .category-tag { align-self: center; font-size: 12px; letter-spacing: 0.08em; color: var(--teal); font-family: 'Space Grotesk', sans-serif; }
+  .question-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px; line-height: 1.65;
+    text-align: center; padding: 8px 4px;
+    min-height: 88px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .choices { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
+  .choice {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    text-align: left;
+    color: var(--ink);
+    font-size: 15px; line-height: 1.6;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    font-family: 'Pretendard', sans-serif;
+    width: 100%;
+    box-shadow: 0 1px 8px rgba(28,43,32,0.06);
+  }
+  .choice:hover { border-color: var(--gold); box-shadow: 0 2px 14px rgba(184,137,43,0.15); }
+  .choice:active { transform: scale(0.985); }
+  .choice-letter { font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: var(--gold); display: block; margin-bottom: 6px; letter-spacing: 0.1em; }
+  .back-link {
+    text-align: center; font-size: 13px; color: var(--ink-faint);
+    background: none; border: none; cursor: pointer; padding: 8px;
+    font-family: 'Pretendard', sans-serif;
+  }
+
+  /* ── RESULT ── */
+  #result { gap: 16px; }
+  .result-hero {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 32px 24px 28px;
+    text-align: center;
+    box-shadow: 0 2px 16px rgba(28,43,32,0.07);
+  }
+  .result-title {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 23px; color: var(--gold);
+    line-height: 1.45;
+    margin: 8px 0 6px;
+  }
+  .result-sub { font-size: 14px; color: var(--ink-faint); margin-bottom: 22px; }
+  .pct-ring {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto;
+  }
+  .pct-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px; font-weight: 700; color: var(--gold);
+  }
+  .pct-label { font-size: 11px; color: var(--ink-faint); margin-top: 1px; }
+
+  .cat-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 24px 22px;
+    box-shadow: 0 2px 16px rgba(28,43,32,0.07);
+  }
+  .cat-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .cat-item { margin-bottom: 22px; }
+  .cat-item:last-child { margin-bottom: 0; }
+  .cat-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .cat-item-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .cat-item-pct { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--teal); }
+  .cat-bar-track { height: 5px; background: var(--line); border-radius: 5px; overflow: hidden; margin-bottom: 9px; }
+  .cat-bar-fill { height: 100%; background: var(--teal); border-radius: 5px; width: 0%; transition: width 0.9s cubic-bezier(.25,.8,.25,1); }
+  .cat-item-desc { font-size: 13.5px; color: var(--ink-dim); line-height: 1.75; }
+
+  .cta-row { display: flex; flex-direction: column; gap: 10px; }
+  .source-note { font-size: 11.5px; color: var(--ink-faint); line-height: 1.65; padding: 0 8px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- INTRO -->
+  <div class="screen active" id="intro">
+    <div class="eyebrow">Money Mindset Check</div>
+    <h1>부자 마인드 자가진단</h1>
+    <div style="display:flex; justify-content:center; margin: 4px 0;">
+      <svg width="210" height="148" viewBox="0 0 210 148" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="74" r="66" fill="rgba(184,137,43,0.07)"/>
+        <rect x="18"  y="96"  width="22" height="34" rx="6" fill="#D6AE4F" opacity="0.30"/>
+        <rect x="48"  y="78"  width="22" height="52" rx="6" fill="#D6AE4F" opacity="0.50"/>
+        <rect x="78"  y="58"  width="22" height="72" rx="6" fill="#C9A44A" opacity="0.72"/>
+        <rect x="108" y="40"  width="22" height="90" rx="6" fill="#B8892B" opacity="0.88"/>
+        <rect x="138" y="24"  width="22" height="106" rx="6" fill="#1E8A6A"/>
+        <polyline points="29,93 59,76 89,56 119,38 149,22"
+          stroke="#8B6A1F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M143 15 L149 7 L155 15" stroke="#8B6A1F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="182" cy="46" r="18" fill="#FBF0D0" stroke="#D6AE4F" stroke-width="2"/>
+        <text x="182" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-weight="700" fill="#B8892B">$</text>
+        <circle cx="188" cy="92" r="12" fill="#FBF0D0" stroke="#C9A44A" stroke-width="1.5" opacity="0.75"/>
+        <text x="188" y="97" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#9C7A22" opacity="0.75">₩</text>
+        <circle cx="12"  cy="58" r="4" fill="#D6AE4F" opacity="0.45"/>
+        <circle cx="6"   cy="78" r="2.5" fill="#C9A44A" opacity="0.35"/>
+        <circle cx="170" cy="120" r="3" fill="#1E8A6A" opacity="0.4"/>
+      </svg>
+    </div>
+    <p class="sub">돈과 기회, 목표를 바라보는 방식이 곧 재정적 결과를 만든다는 이야기가 있어요. 24개의 질문으로 지금 내 사고방식이 어느 쪽에 더 가까운지 확인해보세요.</p>
+    <div class="meta-row">
+      <span><span class="dot"></span>24문항</span>
+      <span><span class="dot"></span>약 3분</span>
+      <span><span class="dot"></span>6개 영역</span>
+    </div>
+    <button class="btn btn-primary" onclick="startQuiz()">테스트 시작하기</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quiz">
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-num" id="progressNum">1 / 24</div>
+    </div>
+    <div class="category-tag" id="categoryTag"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="choices">
+      <button class="choice" id="choiceA" onclick="answer('A')">
+        <span class="choice-letter">A</span>
+        <span id="choiceAText"></span>
+      </button>
+      <button class="choice" id="choiceB" onclick="answer('B')">
+        <span class="choice-letter">B</span>
+        <span id="choiceBText"></span>
+      </button>
+    </div>
+    <button class="back-link" id="backBtn" onclick="goBack()">← 이전 질문</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="result">
+    <div class="result-hero">
+      <div id="charDisplay" style="display:flex;justify-content:center;margin-bottom:8px;"></div>
+      <div class="eyebrow">당신의 머니 마인드</div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="pct-ring">
+        <div class="pct-num" id="resultPct">0%</div>
+        <div class="pct-label">부자 마인드</div>
+      </div>
+    </div>
+
+    <div class="cat-card">
+      <div class="cat-section-title">영역별 분석</div>
+      <div id="catBreakdown"></div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="location.reload()">다시 테스트하기</button>
+    </div>
+    <p class="source-note">이 테스트는 「부자습관 가난한 습관」(톰 콜리·마이클 야드니)의 문제의식에서 영감을 받아 독자적으로 새롭게 구성한 콘텐츠입니다.</p>
+  </div>
+
+</div>
+<script>
+const QUESTIONS_RAW = [
+  { cat:"소비와 투자", q:"돈이 생겼을 때 나의 첫 반응은?", rich:"어떻게 불릴 수 있을지 먼저 생각한다", poor:"갖고 싶었던 것, 필요한 것부터 산다" },
+  { cat:"소비와 투자", q:"한 달 예산을 짤 때 나는?", rich:"저축·투자를 먼저 빼고 나머지로 생활한다", poor:"쓰고 남은 걸 저축한다" },
+  { cat:"소비와 투자", q:"빚에 대한 나의 생각은?", rich:"소비가 아닌 자산을 위한 지출이라면 의미 있다고 생각한다", poor:"돈은 빚지지 않고 내 힘으로만 모아야 한다" },
+  { cat:"소비와 투자", q:"내 돈의 흐름(수입·지출)을 파악하는 편인가?", rich:"숫자로 정확히 파악하려 한다", poor:"대략 감으로만 알고 있다" },
+
+  { cat:"안정과 기회", q:"안정적인 직장에 대한 나의 생각은?", rich:"수입원이 하나뿐이면 불안하다", poor:"하나만 있어도 크게 문제가 없다" },
+  { cat:"안정과 기회", q:"낯선 기회나 제안 앞에서 나는?", rich:"긍정적으로 검토해본다", poor:"리스크가 조금이라도 보이면 거른다" },
+  { cat:"안정과 기회", q:"실패 가능성이 있는 도전 앞에서 나는?", rich:"실패해도 배우는 게 있다고 생각한다", poor:"시작하지 않는 게 낫다고 생각한다" },
+  { cat:"안정과 기회", q:"지금 상황이 크게 불편하지 않을 때 나는?", rich:"그래도 다음 단계를 계속 고민한다", poor:"굳이 변화를 추구하지 않는다" },
+
+  { cat:"목표와 태도", q:"나는 목표를 잡을 때?", rich:"크게 잡아야 움직이는 힘이 생긴다고 본다", poor:"실망하지 않으려고 현실적으로 잡는다" },
+  { cat:"목표와 태도", q:"내 인생의 방향에 대해 나는?", rich:"내가 결정하고 만들어갈 수 있다고 믿는다", poor:"어차피 흘러가는 대로 사는 거라고 생각한다" },
+  { cat:"목표와 태도", q:"문제가 생겼을 때 당신은 가장 먼저?", rich:"어떻게 해결할 수 있을지 방법을 먼저 찾는다", poor:"이 상황의 장애물과 어려움에 집중한다" },
+  { cat:"목표와 태도", q:"시간 관점에서 나는?", rich:"5년, 10년 뒤를 그리며 지금을 계획한다", poor:"눈앞의 상황에 집중하는 편이다" },
+
+  { cat:"돈에 대한 감정", q:"주변의 부자나 성공한 사람을 볼 때 나는?", rich:"배울 점이 뭔지 먼저 찾아본다", poor:"왠지 거리감이나 반감이 먼저 든다" },
+  { cat:"돈에 대한 감정", q:"돈 이야기를 꺼내는 게?", rich:"자연스럽고 담담하게 할 수 있다", poor:"왠지 불편하고 어색하다" },
+  { cat:"돈에 대한 감정", q:"돈이 많아지면?", rich:"선택지와 기회가 늘어나 삶의 질이 달라진다고 본다", poor:"돈이 생겨도 내 삶이 크게 달라질 것 같지 않다" },
+  { cat:"돈에 대한 감정", q:"나는 부자가 될 자격이 내게 있다고 생각하는가?", rich:"충분히 있다", poor:"솔직히 잘 모르겠다" },
+
+  { cat:"배움과 성장", q:"졸업 이후 배움에 대해 나는?", rich:"지금도 계속 새로운 것을 배우고 있다", poor:"따로 공부할 필요를 잘 못 느낀다" },
+  { cat:"배움과 성장", q:"돈을 버는 데 필요한 것은?", rich:"아이디어와 실행력으로도 돈을 만들 수 있다", poor:"어느 정도 돈이 있어야 돈을 번다" },
+  { cat:"배움과 성장", q:"학벌·스펙과 경제적 성공의 관계는?", rich:"사고방식이 스펙보다 더 중요하다", poor:"학벌이나 자격증이 있어야 경제적으로 성공하기 유리하다" },
+  { cat:"배움과 성장", q:"내 실수에 대해 나는?", rich:"돌아보고 다음에 활용하려 한다", poor:"되도록 빨리 잊고 넘어가고 싶다" },
+
+  { cat:"관계와 나눔", q:"나보다 경제적으로 잘 되는 사람이 주변에 생겼을 때 나는?", rich:"어떻게 했는지 물어보고 배우려 한다", poor:"왠지 비교가 되고 불편하다" },
+  { cat:"관계와 나눔", q:"인맥 관리에 대해 나는?", rich:"좋은 관계가 기회로 이어진다는 걸 알고 관리한다", poor:"따로 시간을 크게 쓰지 않는다" },
+  { cat:"관계와 나눔", q:"기부나 나눔에 대해 나는?", rich:"지금 가진 것 안에서도 나눌 방법을 찾는다", poor:"여유가 생기면 그때 생각해보겠다" },
+  { cat:"관계와 나눔", q:"돈 관련 목표를 세울 때 나는?", rich:"구체적인 숫자와 기한을 정한다", poor:"막연하게 '많이 모아야지' 수준으로 생각한다" }
+];
+
+const CHAR_SVGS = [
+'<svg width="130" viewBox="0 0 80 95" fill="none"><ellipse cx="16" cy="58" rx="10" ry="14" fill="#FFFAC0" stroke="#E0D050" stroke-width="0.8" transform="rotate(-20 16 58)"/><ellipse cx="64" cy="58" rx="10" ry="14" fill="#FFFAC0" stroke="#E0D050" stroke-width="0.8" transform="rotate(20 64 58)"/><ellipse cx="18" cy="14" rx="9" ry="11" fill="#C17A3A"/><ellipse cx="62" cy="14" rx="9" ry="11" fill="#C17A3A"/><ellipse cx="40" cy="11" rx="21" ry="9" fill="#C17A3A"/><circle cx="18" cy="8" r="4" fill="#8B3A3A"/><circle cx="62" cy="8" r="4" fill="#8B3A3A"/><circle cx="40" cy="27" r="21" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="30" cy="26" rx="6" ry="7" fill="white"/><circle cx="30" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="27.5" cy="23.5" r="2.5" fill="white" opacity="0.9"/><circle cx="32.5" cy="30" r="1.2" fill="white" opacity="0.6"/><ellipse cx="50" cy="26" rx="6" ry="7" fill="white"/><circle cx="50" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="47.5" cy="23.5" r="2.5" fill="white" opacity="0.9"/><circle cx="52.5" cy="30" r="1.2" fill="white" opacity="0.6"/><path d="M24 21 Q30 17 36 21" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M44 21 Q50 17 56 21" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><ellipse cx="60" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><path d="M33 36 Q40 43 47 36" stroke="#C47A80" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="64" rx="17" ry="13" fill="#C899D4"/><path d="M24 60 C12 64 9 74 11 80" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M56 60 C68 64 71 74 69 80" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><rect x="5" y="72" width="12" height="14" rx="3" fill="#E8C84B" stroke="#B8A030" stroke-width="0.8"/><path d="M7 72 Q11 65 15 72" stroke="#B8A030" stroke-width="1.2" fill="none"/><rect x="63" y="72" width="12" height="14" rx="3" fill="#4FA98A" stroke="#1E8A6A" stroke-width="0.8"/><path d="M65 72 Q69 65 73 72" stroke="#1E8A6A" stroke-width="1.2" fill="none"/><ellipse cx="32" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><ellipse cx="48" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><path d="M60 10 L61 6 L62 10 L66 11 L62 12 L61 16 L60 12 L56 11 Z" fill="#D6AE4F"/></svg>',
+'<svg width="130" viewBox="0 0 80 95" fill="none"><path d="M22 20 C20 10 28 4 40 5 C52 4 60 10 58 20 L55 16 L50 12 L40 10 L30 12 L25 16 Z" fill="#3A2010"/><path d="M22 20 C18 14 16 8 20 5" stroke="#3A2010" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M58 20 C62 14 64 8 60 5" stroke="#3A2010" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="40" cy="27" r="21" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="30" cy="25" rx="6.5" ry="7.5" fill="white"/><circle cx="30" cy="26" r="5.2" fill="#1A0E0A"/><circle cx="27" cy="22.5" r="2.8" fill="white" opacity="0.9"/><circle cx="33" cy="29.5" r="1.3" fill="white" opacity="0.6"/><ellipse cx="50" cy="25" rx="6.5" ry="7.5" fill="white"/><circle cx="50" cy="26" r="5.2" fill="#1A0E0A"/><circle cx="47" cy="22.5" r="2.8" fill="white" opacity="0.9"/><circle cx="53" cy="29.5" r="1.3" fill="white" opacity="0.6"/><path d="M23 18 Q30 13 37 18" stroke="#1A0E0A" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M43 18 Q50 13 57 18" stroke="#1A0E0A" stroke-width="1.5" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="33" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><ellipse cx="60" cy="33" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><path d="M32 36 Q40 44 48 36" stroke="#C47A80" stroke-width="2" fill="#FFD0D0" stroke-linecap="round"/><ellipse cx="40" cy="64" rx="17" ry="13" fill="#C05040"/><path d="M56 56 C62 48 68 42 66 34" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><rect x="60" y="18" width="18" height="12" rx="3" fill="#B8892B" stroke="#8B6A2A" stroke-width="0.8"/><rect x="62" y="21" width="8" height="4" rx="1" fill="#D6AE4F"/><path d="M24 60 C16 64 13 72 15 78" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><ellipse cx="32" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><ellipse cx="48" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><circle cx="10" cy="46" r="6" fill="#D6AE4F"/><text x="10" y="50" text-anchor="middle" font-size="7" font-weight="700" fill="#7A5A18">$</text><circle cx="8" cy="58" r="4" fill="#D6AE4F" opacity="0.7"/></svg>',
+'<svg width="130" viewBox="0 0 80 95" fill="none"><rect x="5" y="56" width="70" height="35" rx="10" fill="#C9A44A" opacity="0.18"/><rect x="3" y="48" width="14" height="43" rx="7" fill="#C9A44A" opacity="0.3"/><rect x="63" y="48" width="14" height="43" rx="7" fill="#C9A44A" opacity="0.3"/><rect x="10" y="84" width="8" height="10" rx="4" fill="#8B6A2A"/><rect x="62" y="84" width="8" height="10" rx="4" fill="#8B6A2A"/><ellipse cx="40" cy="13" rx="20" ry="8" fill="#3A2A1A"/><circle cx="40" cy="27" r="21" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="30" cy="26" rx="6" ry="5.5" fill="white"/><ellipse cx="30" cy="27.5" rx="5.5" ry="3" fill="#1A0E0A"/><circle cx="28" cy="25.5" r="2" fill="white" opacity="0.8"/><ellipse cx="50" cy="26" rx="6" ry="5.5" fill="white"/><ellipse cx="50" cy="27.5" rx="5.5" ry="3" fill="#1A0E0A"/><circle cx="48" cy="25.5" r="2" fill="white" opacity="0.8"/><path d="M24 22 Q30 20 36 22" stroke="#1A0E0A" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M44 22 Q50 20 56 22" stroke="#1A0E0A" stroke-width="1" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="33" rx="7" ry="5" fill="#FFB6A0" opacity="0.4"/><ellipse cx="60" cy="33" rx="7" ry="5" fill="#FFB6A0" opacity="0.4"/><path d="M34 35 Q40 40 46 35" stroke="#C47A80" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="63" rx="17" ry="13" fill="#8A9080"/><rect x="8" y="55" width="18" height="8" rx="4" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><rect x="54" y="55" width="18" height="8" rx="4" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><rect x="54" y="48" width="13" height="14" rx="3" fill="white" stroke="#C4956A" stroke-width="0.8"/><path d="M67 54 Q72 54 72 58 Q72 62 67 62" stroke="#C4956A" stroke-width="0.8" fill="none"/><path d="M57 46 Q58 42 57 38" stroke="#AAAAAA" stroke-width="0.8" fill="none" stroke-linecap="round"/><path d="M61 46 Q62 42 61 38" stroke="#AAAAAA" stroke-width="0.8" fill="none" stroke-linecap="round"/><ellipse cx="32" cy="80" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><ellipse cx="48" cy="80" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/></svg>',
+'<svg width="130" viewBox="0 0 80 95" fill="none"><ellipse cx="40" cy="12" rx="20" ry="9" fill="#6B4226"/><path d="M20 17 C18 25 19 32 21 40" stroke="#6B4226" stroke-width="5" stroke-linecap="round" fill="none"/><rect x="37" y="4" width="3" height="14" rx="1.5" fill="#4FA98A" transform="rotate(15 38 4)"/><circle cx="40" cy="27" r="21" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="30" cy="26" rx="6" ry="7" fill="white"/><circle cx="30" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="27.5" cy="23.5" r="2.5" fill="white" opacity="0.9"/><circle cx="32.5" cy="30" r="1.2" fill="white" opacity="0.6"/><ellipse cx="50" cy="26" rx="6" ry="7" fill="white"/><circle cx="50" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="47.5" cy="23.5" r="2.5" fill="white" opacity="0.9"/><circle cx="52.5" cy="30" r="1.2" fill="white" opacity="0.6"/><path d="M24 21 Q30 17 36 21" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M44 21 Q50 17 56 21" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><ellipse cx="60" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><path d="M34 35 Q40 40 46 35" stroke="#C47A80" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="64" rx="17" ry="13" fill="#B8892B"/><path d="M24 60 C14 62 10 70 12 78" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M56 60 C66 62 70 70 68 78" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><rect x="61" y="50" width="14" height="18" rx="3" fill="white" stroke="#C4956A" stroke-width="0.8"/><line x1="64" y1="56" x2="72" y2="56" stroke="#C4956A" stroke-width="0.8"/><line x1="64" y1="59" x2="72" y2="59" stroke="#C4956A" stroke-width="0.8"/><line x1="64" y1="62" x2="69" y2="62" stroke="#C4956A" stroke-width="0.8"/><rect x="54" y="70" width="22" height="6" rx="2" fill="#4FA98A"/><rect x="55" y="63" width="20" height="6" rx="2" fill="#B8892B"/><rect x="53" y="56" width="22" height="6" rx="2" fill="#C0654A"/><ellipse cx="32" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><ellipse cx="48" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/></svg>',
+'<svg width="130" viewBox="0 0 80 95" fill="none"><path d="M19 20 Q40 8 61 20 L61 12 Q40 0 19 12 Z" fill="#3A2E1A"/><circle cx="40" cy="27" r="21" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="30" cy="26" rx="6" ry="7" fill="white"/><circle cx="30" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="27.5" cy="23.5" r="2.5" fill="white" opacity="0.9"/><ellipse cx="50" cy="26" rx="6" ry="7" fill="white"/><circle cx="50" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="47.5" cy="23.5" r="2.5" fill="white" opacity="0.9"/><path d="M24 21 Q30 18 36 21" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M44 18 Q50 21 56 18" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><ellipse cx="60" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.45"/><path d="M32 36 L36 33 L40 36 L44 33 L48 36" stroke="#C47A80" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 52 C23 48 40 48 40 48 C40 48 57 48 57 52 C57 66 57 76 40 79 C23 76 23 66 23 52 Z" fill="#4A5E6A"/><path d="M40 48 C57 48 57 52 57 66 C57 76 40 79 40 79 Z" fill="#B8892B"/><path d="M38 48 L36 55 L40 59 L44 55 L42 48" fill="#C0654A"/><path d="M24 58 C14 62 10 70 12 78" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M56 58 C66 62 70 70 68 78" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><rect x="62" y="68" width="9" height="14" rx="2" fill="#1A1A1A"/><rect x="63" y="70" width="7" height="10" rx="1" fill="#4FA98A" opacity="0.7"/><ellipse cx="32" cy="83" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><ellipse cx="48" cy="83" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><text x="8" y="38" font-size="16" fill="#8E9E90" font-weight="700">?</text></svg>',
+'<svg width="130" viewBox="0 0 80 95" fill="none"><line x1="40" y1="7" x2="40" y2="1" stroke="#1E8A6A" stroke-width="2.5"/><ellipse cx="33" cy="3" rx="9" ry="5" fill="#1E8A6A" transform="rotate(-15 33 3)"/><ellipse cx="47" cy="2" rx="8" ry="4.5" fill="#2AAA8A" transform="rotate(15 47 2)"/><circle cx="33" cy="1" r="2" fill="#0A6A50"/><ellipse cx="40" cy="14" rx="20" ry="9" fill="#5A3A1A"/><circle cx="40" cy="27" r="21" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="29" cy="26" rx="6" ry="7" fill="white"/><circle cx="31" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="29" cy="23.5" r="2.5" fill="white" opacity="0.9"/><circle cx="34" cy="30" r="1.2" fill="white" opacity="0.6"/><ellipse cx="51" cy="26" rx="6" ry="7" fill="white"/><circle cx="53" cy="27" r="4.8" fill="#1A0E0A"/><circle cx="51" cy="23.5" r="2.5" fill="white" opacity="0.9"/><circle cx="56" cy="30" r="1.2" fill="white" opacity="0.6"/><path d="M23 21 Q29 17 35 21" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M45 21 Q51 17 57 21" stroke="#1A0E0A" stroke-width="1.2" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.4"/><ellipse cx="60" cy="34" rx="7" ry="5" fill="#FFB6A0" opacity="0.4"/><path d="M34 35 Q40 40 47 37" stroke="#C47A80" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="64" rx="17" ry="13" fill="#1E8A6A"/><path d="M24 60 C14 62 10 70 12 78" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M56 60 C66 62 70 70 68 78" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><ellipse cx="32" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><ellipse cx="48" cy="82" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><path d="M58 10 L59 6 L60 10 L64 11 L60 12 L59 16 L58 12 L54 11 Z" fill="#D6AE4F" opacity="0.85"/></svg>',
+'<svg width="130" viewBox="0 0 80 95" fill="none"><line x1="66" y1="26" x2="66" y2="82" stroke="#C0654A" stroke-width="2" opacity="0.7"/><line x1="66" y1="34" x2="78" y2="34" stroke="#C0654A" stroke-width="1.5" opacity="0.7"/><text x="67" y="31" font-size="5" fill="#C0654A" font-weight="700">FINISH</text><path d="M22 18 C20 10 30 5 38 6 C46 5 52 8 52 16 L48 12 L38 10 L28 14 Z" fill="#4A2E1A"/><path d="M52 16 C58 14 62 10 58 6" stroke="#4A2E1A" stroke-width="4" stroke-linecap="round" fill="none"/><circle cx="36" cy="26" r="19" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="28" cy="25" rx="5.5" ry="6.5" fill="white"/><circle cx="28" cy="26" r="4.5" fill="#1A0E0A"/><circle cx="25.5" cy="22.5" r="2.3" fill="white" opacity="0.9"/><ellipse cx="44" cy="25" rx="5.5" ry="6.5" fill="white"/><circle cx="44" cy="26" r="4.5" fill="#1A0E0A"/><circle cx="41.5" cy="22.5" r="2.3" fill="white" opacity="0.9"/><path d="M22 19 Q28 15 34 19" stroke="#1A0E0A" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M38 19 Q44 15 50 19" stroke="#1A0E0A" stroke-width="1.3" fill="none" stroke-linecap="round"/><ellipse cx="18" cy="32" rx="6.5" ry="4.5" fill="#FFB6A0" opacity="0.45"/><ellipse cx="54" cy="32" rx="6.5" ry="4.5" fill="#FFB6A0" opacity="0.45"/><path d="M30 34 Q37 40 45 34" stroke="#C47A80" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="36" cy="62" rx="16" ry="13" fill="#C07A30" transform="rotate(-8 36 62)"/><path d="M40 56 C52 52 60 46 60 36" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M22 56 C12 52 8 58 10 66" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><ellipse cx="28" cy="78" rx="8" ry="5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8" transform="rotate(-15 28 78)"/><ellipse cx="44" cy="82" rx="8" ry="5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8" transform="rotate(10 44 82)"/><circle cx="6" cy="44" r="2.5" fill="#F5D5A0" opacity="0.5"/><circle cx="4" cy="54" r="2" fill="#F5D5A0" opacity="0.4"/><circle cx="5" cy="64" r="1.5" fill="#F5D5A0" opacity="0.3"/></svg>',
+'<svg width="130" viewBox="0 0 80 95" fill="none"><path d="M22 20 L22 11 L30 16 L40 6 L50 16 L58 11 L58 20 Z" fill="#D6AE4F" stroke="#B8892B" stroke-width="0.8"/><circle cx="40" cy="7" r="4" fill="#C0654A"/><circle cx="22" cy="12" r="3" fill="#4FA98A"/><circle cx="58" cy="12" r="3" fill="#4FA98A"/><ellipse cx="40" cy="15" rx="20" ry="8" fill="#4A2E1A"/><path d="M20 20 C16 30 18 38 21 46" stroke="#4A2E1A" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M60 20 C64 30 62 38 59 46" stroke="#4A2E1A" stroke-width="5" stroke-linecap="round" fill="none"/><circle cx="40" cy="30" r="21" fill="#F5D5A0" stroke="#C4956A" stroke-width="1"/><ellipse cx="30" cy="29" rx="6.5" ry="7.5" fill="white"/><circle cx="30" cy="30" r="5.2" fill="#1A0E0A"/><circle cx="27" cy="26.5" r="2.8" fill="white" opacity="0.9"/><circle cx="33.5" cy="33.5" r="1.4" fill="white" opacity="0.6"/><ellipse cx="50" cy="29" rx="6.5" ry="7.5" fill="white"/><circle cx="50" cy="30" r="5.2" fill="#1A0E0A"/><circle cx="47" cy="26.5" r="2.8" fill="white" opacity="0.9"/><circle cx="53.5" cy="33.5" r="1.4" fill="white" opacity="0.6"/><path d="M23 23 Q30 19 37 23" stroke="#1A0E0A" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M43 23 Q50 19 57 23" stroke="#1A0E0A" stroke-width="1.3" fill="none" stroke-linecap="round"/><ellipse cx="20" cy="37" rx="7" ry="5.5" fill="#FFB6A0" opacity="0.45"/><ellipse cx="60" cy="37" rx="7" ry="5.5" fill="#FFB6A0" opacity="0.45"/><path d="M31 39 Q40 48 49 39" stroke="#C47A80" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="67" rx="17" ry="13" fill="#1A6A4A"/><path d="M24 60 C12 56 8 62 10 72" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M56 60 C68 56 72 62 70 72" stroke="#F5D5A0" stroke-width="8" stroke-linecap="round" fill="none"/><ellipse cx="32" cy="84" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><ellipse cx="48" cy="84" rx="9" ry="5.5" fill="#F5D5A0" stroke="#C4956A" stroke-width="0.8"/><path d="M4 52 L5 48 L6 52 L10 53 L6 54 L5 58 L4 54 L0 53 Z" fill="#D6AE4F"/><path d="M64 24 L65 20 L66 24 L70 25 L66 26 L65 30 L64 26 L60 25 Z" fill="#D6AE4F"/><path d="M70 62 L70.5 59 L71 62 L74 62.5 L71 63 L70.5 66 L70 63 L67 62.5 Z" fill="#D6AE4F" opacity="0.7"/></svg>'
+];
+
+const RESULT_TIERS = [
+  { min:0,  max:12,  title:"행복한 소비 요정",              sub:"지갑은 열려있고 마음은 더 열려있음" },
+  { min:13, max:24,  title:"지름신의 수제자",               sub:"월급날엔 부자, 3일 뒤엔 철학자" },
+  { min:25, max:37,  title:"현상 유지의 달인",              sub:"흔들리지 않는 건지, 움직이지 않는 건지" },
+  { min:38, max:49,  title:"될 것 같은데 아직 안 된 사람", sub:"이유는 본인이 제일 잘 알고 있음" },
+  { min:50, max:62,  title:"체험판 부자 마인드 사용 중",    sub:"정품 전환 고민 중" },
+  { min:63, max:74,  title:"서서히 끓는 물",               sub:"아직 보글보글이지만 방향은 맞음" },
+  { min:75, max:87,  title:"마인드셋 장착 완료, 현재 실행 중", sub:"통장이 생각을 따라오는 중" },
+  { min:88, max:100, title:"부자 DNA 각성 완료",            sub:"이제 실행만 남았고 실행이 전부임" }
+];
+
+const CAT_DESC = {
+  "소비와 투자": {
+    high: "돈이 들어오면 '어떻게 굴릴까'를 먼저 생각하는 회로가 켜진 편이에요. 투자자 마인드가 이미 일상에 자리 잡고 있어요.",
+    mid:  "쓸 때와 굴릴 때를 상황에 따라 오가는 편이에요. 수입의 일정 비율을 무조건 먼저 '굴리는 통장'으로 보내는 규칙 하나만 만들어도 달라질 거예요.",
+    low:  "돈이 생기면 필요한 것부터 채우는 흐름이 익숙한 편이에요. 다음번엔 아주 작은 금액이라도 쓰기 전에 먼저 빼두는 연습을 해보세요."
+  },
+  "안정과 기회": {
+    high: "리스크를 무서워하기보다 계산하는 편이에요. 새로운 기회 앞에서 일단 검토부터 하는 태도가 이미 몸에 배어 있어요.",
+    mid:  "익숙함과 새로움 사이에서 매번 저울질하는 편이에요. 기회가 왔을 때 '왜 안 되는지'보다 '어떻게 해볼 수 있는지'를 먼저 묻는 연습이 필요해요.",
+    low:  "안정을 최우선으로 두는 편이에요. 확실한 장점이지만, 아주 작은 실험 하나씩 해보는 것만으로도 리스크에 대한 감각이 달라질 거예요."
+  },
+  "목표와 태도": {
+    high: "큰 목표를 잡고 스스로 방향을 만드는 힘이 있어요. 문제 앞에서도 '왜 안 되냐'보다 '어떻게 풀까'를 먼저 떠올리는 편이에요.",
+    mid:  "목표는 있지만 크기나 기한이 애매한 편이에요. 목표에 숫자와 날짜를 붙여보는 것만으로 실행력이 확 올라가요.",
+    low:  "눈앞의 상황에 집중하다 보니 먼 미래 계획은 뒷전이 되기 쉬워요. '1년 뒤 나는 어디에 있고 싶다'를 딱 한 문장으로 적어보는 것부터 시작해보세요."
+  },
+  "돈에 대한 감정": {
+    high: "돈 이야기를 담담하게 나눌 수 있고, 부자에게서 배울 점을 먼저 찾아요. 돈에 대한 감정적 저항이 적다는 건 큰 강점이에요.",
+    mid:  "돈 얘기가 편하진 않지만 피하지도 않아요. 어떤 상황에서 돈 생각이 불편해지는지 알아채는 것만으로도 변화가 시작돼요.",
+    low:  "돈 이야기나 부자에 대해 불편함이나 거리감이 있는 편이에요. 이 감정이 어디서 왔는지 한 번만 들여다보면 예상보다 빨리 가벼워질 수 있어요."
+  },
+  "배움과 성장": {
+    high: "지금도 계속 배우고, 실수를 자산으로 바꾸는 편이에요. 학벌보다 사고방식이 중요하다는 걸 이미 실천으로 알고 있어요.",
+    mid:  "필요할 때는 배우지만 꾸준한 루틴까진 아닌 편이에요. 한 달에 책 한 권, 한 주에 영상 하나처럼 작은 학습 습관 하나를 고정해보세요.",
+    low:  "새로 배우는 것에 큰 동기를 느끼지 못하는 편이에요. 관심 있는 분야의 콘텐츠 하나만 골라 10분씩 보는 것부터 시작해보세요."
+  },
+  "관계와 나눔": {
+    high: "관계를 기회로 연결하고, 가진 것 안에서도 나누려는 태도가 있어요. 돈 얘기를 믿을 사람과 나눌 수 있다는 건 생각보다 중요한 능력이에요.",
+    mid:  "필요할 때만 관계를 챙기는 편이에요. 평소에 작게라도 연결을 유지해두면 좋은 기회가 왔을 때 훨씬 자연스럽게 흘러들어와요.",
+    low:  "돈이나 관계를 혼자 감당하려는 경향이 있어요. 작은 것 하나를 나누거나 터놓는 연습이 뜻밖의 기회로 이어지는 경우가 꽤 많아요."
+  }
+};
+
+let shuffledOptions = [];
+let current = 0;
+let answers = [];
+
+function startQuiz() {
+  shuffledOptions = QUESTIONS_RAW.map(() => Math.random() > 0.5);
+  current = 0;
+  answers = [];
+  document.getElementById('intro').classList.remove('active');
+  document.getElementById('quiz').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS_RAW[current];
+  const richIsA = shuffledOptions[current];
+  document.getElementById('categoryTag').textContent = q.cat;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('choiceAText').textContent = richIsA ? q.rich : q.poor;
+  document.getElementById('choiceBText').textContent = richIsA ? q.poor : q.rich;
+  document.getElementById('progressFill').style.width = (current / QUESTIONS_RAW.length * 100) + '%';
+  document.getElementById('progressNum').textContent = (current + 1) + ' / ' + QUESTIONS_RAW.length;
+  document.getElementById('backBtn').style.visibility = current === 0 ? 'hidden' : 'visible';
+}
+
+function answer(choice) {
+  const richIsA = shuffledOptions[current];
+  const isRich = (choice === 'A') === richIsA;
+  answers[current] = isRich;
+  current++;
+  if (current >= QUESTIONS_RAW.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function goBack() {
+  if (current === 0) return;
+  current--;
+  answers.pop();
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quiz').classList.remove('active');
+  document.getElementById('result').classList.add('active');
+
+  const richCount = answers.filter(Boolean).length;
+  const pct = Math.round((richCount / QUESTIONS_RAW.length) * 100);
+
+  const tierIndex = RESULT_TIERS.findIndex(t => pct >= t.min && pct <= t.max);
+  const tier = RESULT_TIERS[tierIndex];
+  document.getElementById('charDisplay').innerHTML = CHAR_SVGS[tierIndex] || '';
+  document.getElementById('resultTitle').textContent = tier.title;
+  document.getElementById('resultSub').textContent = tier.sub;
+  document.getElementById('resultPct').textContent = pct + '%';
+
+  const cats = {};
+  QUESTIONS_RAW.forEach((q, i) => {
+    if (!cats[q.cat]) cats[q.cat] = { total: 0, rich: 0 };
+    cats[q.cat].total++;
+    if (answers[i]) cats[q.cat].rich++;
+  });
+
+  const breakdown = document.getElementById('catBreakdown');
+  breakdown.innerHTML = '';
+  Object.keys(cats).forEach(cat => {
+    const c = cats[cat];
+    const catPct = Math.round((c.rich / c.total) * 100);
+    const d = CAT_DESC[cat];
+    const desc = catPct >= 75 ? d.high : catPct >= 40 ? d.mid : d.low;
+    const item = document.createElement('div');
+    item.className = 'cat-item';
+    item.innerHTML =
+      '<div class="cat-item-header">' +
+        '<span class="cat-item-name">' + cat + '</span>' +
+        '<span class="cat-item-pct">' + catPct + '%</span>' +
+      '</div>' +
+      '<div class="cat-bar-track"><div class="cat-bar-fill" data-target="' + catPct + '"></div></div>' +
+      '<div class="cat-item-desc">' + desc + '</div>';
+    breakdown.appendChild(item);
+  });
+
+  setTimeout(function() {
+    document.querySelectorAll('.cat-bar-fill').forEach(function(bar) {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }, 120);
+}
+</script>
+</body>
+</html>
