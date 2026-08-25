@@ -485,12 +485,6 @@ function showResult() {
   document.getElementById('resultTitle').textContent = tier.title;
   document.getElementById('resultSub').textContent = tier.sub;
   document.getElementById('resultPct').textContent = pct + '%';
-  const catOrder = ['소비와 투자','안정과 기회','목표와 태도','돈에 대한 감정','배움과 성장','관계와 나눔'];
-  const catPctArr = catOrder.map(function(cat) {
-    const c = cats[cat];
-    return c ? Math.round((c.rich / c.total) * 100) : 0;
-  });
-  history.replaceState(null, null, '#result=' + pct + ',' + catPctArr.join(','));
 
   const cats = {};
   QUESTIONS_RAW.forEach((q, i) => {
@@ -498,6 +492,13 @@ function showResult() {
     cats[q.cat].total++;
     if (answers[i]) cats[q.cat].rich++;
   });
+
+  const catOrder = ['소비와 투자','안정과 기회','목표와 태도','돈에 대한 감정','배움과 성장','관계와 나눔'];
+  const catPctArr = catOrder.map(function(cat) {
+    const c = cats[cat];
+    return c ? Math.round((c.rich / c.total) * 100) : 0;
+  });
+  history.replaceState(null, null, '#result=' + pct + ',' + catPctArr.join(','));
 
   const breakdown = document.getElementById('catBreakdown');
   breakdown.innerHTML = '';
