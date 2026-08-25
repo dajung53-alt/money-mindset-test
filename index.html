@@ -498,7 +498,7 @@ function showResult() {
     const c = cats[cat];
     return c ? Math.round((c.rich / c.total) * 100) : 0;
   });
-  history.replaceState(null, null, '#result=' + pct + ',' + catPctArr.join(','));
+  try { history.replaceState(null, null, '#result=' + pct + ',' + catPctArr.join(',')); } catch(e) {}
 
   const breakdown = document.getElementById('catBreakdown');
   breakdown.innerHTML = '';
