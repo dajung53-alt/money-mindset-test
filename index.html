@@ -264,14 +264,14 @@
       </div>
     </div>
 
-    <div class="cat-card">
+    <div class="cat-card" id="catCard">
       <div class="cat-section-title">영역별 분석</div>
       <div id="catBreakdown"></div>
     </div>
 
     <div class="cta-row">
-      <button class="btn btn-primary" onclick="location.reload()">다시 테스트하기</button>
-      <button class="btn btn-ghost" onclick="shareResult()">결과 공유하기</button>
+      <button class="btn btn-primary" id="retakeBtn" onclick="location.reload()">다시 테스트하기</button>
+      <button class="btn btn-ghost" id="shareBtn" onclick="shareResult()">결과 공유하기</button>
     </div>
     <p class="source-note">이 테스트는 「부자습관 가난한 습관」(톰 콜리·마이클 야드니)의 문제의식에서 영감을 받아 독자적으로 새롭게 구성한 콘텐츠입니다.</p>
   </div>
@@ -372,7 +372,8 @@ let answers = [];
 window.addEventListener('DOMContentLoaded', function() {
   const hash = window.location.hash;
   if (hash && hash.startsWith('#result=')) {
-    const pct = parseInt(hash.replace('#result=', ''));
+    const parts = hash.replace('#result=', '').split(',').map(Number);
+    const pct = parts[0];
     if (!isNaN(pct) && pct >= 0 && pct <= 100) {
       document.getElementById('intro').classList.remove('active');
       document.getElementById('result').classList.add('active');
@@ -381,8 +382,36 @@ window.addEventListener('DOMContentLoaded', function() {
       document.getElementById('resultTitle').textContent = tier.title;
       document.getElementById('resultSub').textContent = tier.sub;
       document.getElementById('resultPct').textContent = pct + '%';
-      document.getElementById('catBreakdown').innerHTML =
-        '<p style="font-size:14px;color:var(--ink-dim);text-align:center;line-height:1.8;padding:8px 0;">친구의 결과예요!<br>나는 어떤 머니 마인드인지 확인해볼까요?</p>';
+      const catOrder = ['소비와 투자','안정과 기회','목표와 태도','돈에 대한 감정','배움과 성장','관계와 나눔'];
+      const catPctArr = parts.slice(1);
+      const breakdown = document.getElementById('catBreakdown');
+      breakdown.innerHTML = '';
+      catOrder.forEach(function(cat, i) {
+        const catPct = catPctArr[i] !== undefined ? catPctArr[i] : 0;
+        const d = CAT_DESC[cat];
+        const desc = catPct >= 75 ? d.high : catPct >= 40 ? d.mid : d.low;
+        const item = document.createElement('div');
+        item.className = 'cat-item';
+        item.innerHTML =
+          '<div class="cat-item-header">' +
+            '<span class="cat-item-name">' + cat + '</span>' +
+            '<span class="cat-item-pct">' + catPct + '%</span>' +
+          '</div>' +
+          '<div class="cat-bar-track"><div class="cat-bar-fill" data-target="' + catPct + '"></div></div>' +
+          '<div class="cat-item-desc">' + desc + '</div>';
+        breakdown.appendChild(item);
+      });
+      setTimeout(function() {
+        document.querySelectorAll('.cat-bar-fill').forEach(function(bar) {
+          bar.style.width = bar.dataset.target + '%';
+        });
+      }, 120);
+      document.getElementById('shareBtn').style.display = 'none';
+      const retakeBtn = document.getElementById('retakeBtn');
+      retakeBtn.textContent = '나도 테스트하기';
+      retakeBtn.onclick = function() {
+        window.location.href = window.location.pathname;
+      };
     }
   }
 });
@@ -456,7 +485,12 @@ function showResult() {
   document.getElementById('resultTitle').textContent = tier.title;
   document.getElementById('resultSub').textContent = tier.sub;
   document.getElementById('resultPct').textContent = pct + '%';
-  history.replaceState(null, null, '#result=' + pct);
+  const catOrder = ['소비와 투자','안정과 기회','목표와 태도','돈에 대한 감정','배움과 성장','관계와 나눔'];
+  const catPctArr = catOrder.map(function(cat) {
+    const c = cats[cat];
+    return c ? Math.round((c.rich / c.total) * 100) : 0;
+  });
+  history.replaceState(null, null, '#result=' + pct + ',' + catPctArr.join(','));
 
   const cats = {};
   QUESTIONS_RAW.forEach((q, i) => {
