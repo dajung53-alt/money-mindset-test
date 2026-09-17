@@ -238,9 +238,6 @@
   .style-ref { font-size: 13.5px; color: var(--ink-dim); line-height: 1.7; }
   .style-ref b { color: var(--accent); font-weight: 600; }
 
-  .compat-title { font-family: 'Noto Serif KR', serif; font-weight: 700; font-size: 16px; color: var(--ink); margin-bottom: 6px; }
-  .compat-desc { font-size: 13.5px; color: var(--ink-dim); line-height: 1.7; }
-
   .cta-row { display: flex; flex-direction: column; gap: 10px; }
   .source-note { font-size: 11.5px; color: var(--ink-faint); line-height: 1.65; padding: 0 8px; text-align: center; }
 </style>
@@ -266,10 +263,10 @@
         <circle cx="20" cy="48" r="6" fill="#6B7F5E" opacity="0.4"/>
       </svg>
     </div>
-    <p class="sub">18개의 질문으로 알아보는<br>나의 진짜 공간 취향</p>
+    <p class="sub">12개의 질문으로 간단하게 알아보는<br>나의 진짜 공간 취향</p>
     <div class="meta-row">
-      <span><span class="dot"></span>18문항</span>
-      <span><span class="dot"></span>약 3분</span>
+      <span><span class="dot"></span>12문항</span>
+      <span><span class="dot"></span>약 2분</span>
       <span><span class="dot"></span>4개 축</span>
     </div>
     <button class="btn btn-primary" onclick="startQuiz()">테스트 시작하기</button>
@@ -279,7 +276,7 @@
   <div class="screen" id="quiz">
     <div class="progress-row">
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-num" id="progressNum">1 / 18</div>
+      <div class="progress-num" id="progressNum">1 / 12</div>
     </div>
     <div class="category-tag" id="categoryTag"></div>
     <div class="question-text" id="questionText"></div>
@@ -320,12 +317,6 @@
     <div class="card">
       <div class="card-title">잘 어울리는 스타일</div>
       <div class="style-ref" id="styleRef"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">궁합이 좋은 타입</div>
-      <div class="compat-title" id="compatTitle"></div>
-      <div class="compat-desc" id="compatDesc"></div>
     </div>
 
     <div class="cta-row">
@@ -371,11 +362,11 @@ const QUESTIONS = [
     {text:"컬러 포인트 하나", score:1, visual:{type:"color", colors:["#C1694A"]}},
     {text:"원색·패턴 믹스매치", score:2, visual:{type:"color", colors:["#E4523A","#F2C230","#3C7CA6"]}}] },
 
-  { axis:"tone", q:"잠자리에서 좋아하는 침구 톤은?", options:[
-    {text:"화이트", score:-2, visual:{type:"color", colors:["#FFFFFF"]}},
-    {text:"크림·오트밀", score:-1, visual:{type:"color", colors:["#F0E6D2","#E3D3B5"]}},
-    {text:"그레이·카키", score:1, visual:{type:"color", colors:["#9C9686","#8A8F6E"]}},
-    {text:"블랙·버건디", score:2, visual:{type:"color", colors:["#1C1C1C","#5A1F2A"]}}] },
+  { axis:"tone", q:"가장 편안하게 느끼는 거실 조명 분위기는?", options:[
+    {text:"화사한 자연광 가득", score:-2, visual:{type:"color", colors:["#FFF6D9"]}},
+    {text:"밝은 화이트 조명", score:-1, visual:{type:"color", colors:["#F5F3EC"]}},
+    {text:"은은한 무드등", score:1, visual:{type:"color", colors:["#D9B36C"]}},
+    {text:"어둡고 그림자 있는 포인트 조명", score:2, visual:{type:"color", colors:["#2A2420"]}}] },
   { axis:"density", q:"옷장을 연다면?", options:[
     {text:"옷 몇 벌만 걸린 미니멀 옷장", score:-2, visual:densityVisual(0)},
     {text:"계절별로 정리된 적당한 양", score:-1, visual:densityVisual(1)},
@@ -392,48 +383,6 @@ const QUESTIONS = [
     {text:"큼직한 패턴", score:1, visual:{type:"pattern", style:"bold"}},
     {text:"화려한 컬러 패턴", score:2, visual:{type:"pattern", style:"colorful"}}] },
 
-  { axis:"tone", q:"가장 편안하게 느끼는 거실 조명 분위기는?", options:[
-    {text:"화사한 자연광 가득", score:-2, visual:{type:"color", colors:["#FFF6D9"]}},
-    {text:"밝은 화이트 조명", score:-1, visual:{type:"color", colors:["#F5F3EC"]}},
-    {text:"은은한 무드등", score:1, visual:{type:"color", colors:["#D9B36C"]}},
-    {text:"어둡고 그림자 있는 포인트 조명", score:2, visual:{type:"color", colors:["#2A2420"]}}] },
-  { axis:"density", q:"벽에는 무엇을 걸고 싶나요?", options:[
-    {text:"아무것도 걸지 않은 깨끗한 벽", score:-2, visual:densityVisual(0)},
-    {text:"심플한 액자 하나", score:-1, visual:densityVisual(1)},
-    {text:"갤러리월처럼 여러 장의 사진", score:1, visual:densityVisual(2)},
-    {text:"포스터·소품·조명까지 빼곡하게", score:2, visual:densityVisual(3)}] },
-  { axis:"material", q:"조명 스탠드를 고른다면?", options:[
-    {text:"우드 스탠드 조명", score:-2, visual:{type:"material", mat:"wood"}},
-    {text:"패브릭 갓 조명", score:-1, visual:{type:"material", mat:"fabric"}},
-    {text:"메탈 프레임 조명", score:1, visual:{type:"material", mat:"metal"}},
-    {text:"콘크리트·산업용 조명", score:2, visual:{type:"material", mat:"concrete"}}] },
-  { axis:"mood", q:"커튼 색상으로 고른다면?", options:[
-    {text:"화이트", score:-2, visual:{type:"color", colors:["#FFFFFF"]}},
-    {text:"그레이·베이지", score:-1, visual:{type:"color", colors:["#C9C4B8","#B9AE99"]}},
-    {text:"머스타드·딥그린", score:1, visual:{type:"color", colors:["#D9A93E","#3F5C3E"]}},
-    {text:"레드·블루 등 원색", score:2, visual:{type:"color", colors:["#D64545","#3763A8"]}}] },
-
-  { axis:"tone", q:"끌리는 원목 바닥 톤은?", options:[
-    {text:"화이트 워시 오크", score:-2, visual:{type:"color", colors:["#EDE3D0"]}},
-    {text:"라이트 내추럴 오크", score:-1, visual:{type:"color", colors:["#D9BE94"]}},
-    {text:"미디엄 월넛", score:1, visual:{type:"color", colors:["#8C6A45"]}},
-    {text:"다크 에보니", score:2, visual:{type:"color", colors:["#3A2A1D"]}}] },
-  { axis:"density", q:"테이블 위 스타일은?", options:[
-    {text:"노트북 하나만", score:-2, visual:densityVisual(0)},
-    {text:"스탠드와 컵 정도", score:-1, visual:densityVisual(1)},
-    {text:"캔들·화분·소품들", score:1, visual:densityVisual(2)},
-    {text:"온갖 소품으로 꾸며진 테이블", score:2, visual:densityVisual(3)}] },
-  { axis:"material", q:"선호하는 문·가구 손잡이는?", options:[
-    {text:"우드 손잡이", score:-2, visual:{type:"material", mat:"wood"}},
-    {text:"황동 손잡이", score:-1, visual:{type:"material", mat:"brass"}},
-    {text:"스테인리스 손잡이", score:1, visual:{type:"material", mat:"steel"}},
-    {text:"스틸 파이프 손잡이", score:2, visual:{type:"material", mat:"blacksteel"}}] },
-  { axis:"mood", q:"벽에 걸 그림을 고른다면?", options:[
-    {text:"흑백 사진", score:-2, visual:{type:"art", style:"bw"}},
-    {text:"톤온톤 추상화", score:-1, visual:{type:"art", style:"tone"}},
-    {text:"컬러감 있는 일러스트", score:1, visual:{type:"art", style:"illustration"}},
-    {text:"팝아트·비비드 컬러 작품", score:2, visual:{type:"art", style:"pop"}}] },
-
   { axis:"tone", q:"옷장에 가장 많은 옷 컬러는?", options:[
     {text:"화이트·베이지", score:-2, visual:{type:"color", colors:["#FFFFFF","#E8DCC2"]}},
     {text:"그레이·라이트카키", score:-1, visual:{type:"color", colors:["#B8B2A6","#A6A184"]}},
@@ -443,7 +392,17 @@ const QUESTIONS = [
     {text:"사진만 찍고 사지 않는다", score:-2, visual:densityVisual(0)},
     {text:"작은 것 하나 정도만", score:-1, visual:densityVisual(1)},
     {text:"눈에 띄는 곳에 진열한다", score:1, visual:densityVisual(2)},
-    {text:"방 곳곳에 컬렉션처럼 전시한다", score:2, visual:densityVisual(3)}] }
+    {text:"방 곳곳에 컬렉션처럼 전시한다", score:2, visual:densityVisual(3)}] },
+  { axis:"material", q:"조명 스탠드를 고른다면?", options:[
+    {text:"우드 스탠드 조명", score:-2, visual:{type:"material", mat:"wood"}},
+    {text:"패브릭 갓 조명", score:-1, visual:{type:"material", mat:"fabric"}},
+    {text:"메탈 프레임 조명", score:1, visual:{type:"material", mat:"metal"}},
+    {text:"콘크리트·산업용 조명", score:2, visual:{type:"material", mat:"concrete"}}] },
+  { axis:"mood", q:"벽에 걸 그림을 고른다면?", options:[
+    {text:"흑백 사진", score:-2, visual:{type:"art", style:"bw"}},
+    {text:"톤온톤 추상화", score:-1, visual:{type:"art", style:"tone"}},
+    {text:"컬러감 있는 일러스트", score:1, visual:{type:"art", style:"illustration"}},
+    {text:"팝아트·비비드 컬러 작품", score:2, visual:{type:"art", style:"pop"}}] }
 ];
 
 const TYPES = {
@@ -514,10 +473,10 @@ const TYPES = {
     taste:["블랙 스틸 소재의 가구","매트한 무채색 소품","미니멀한 라인 조명","콘크리트 질감의 바닥재"],
     styleRef:"<b>모던블랙st</b> 인테리어와 잘 맞아요." },
   DMIV: { title:"언더그라운드 갤러리형", sub:"어둠 속 강렬한 컬러 한 점",
-    desc:"블랙 배경 위에 비비드한 컬러 아트웍이나 조명을 포인트로 두는 걸 좋아해요. 절제와 강렬함의 대비를 즐기는 타입이에요.",
-    palette:[["#1A1A1A","블랙"],["#333333","다크그레이"],["#E63946","레드"],["#4C7A96","블루그레이"],["#C9A44A","골드"]],
-    keywords:["#언더그라운드","#네온포인트","#메탈","#대비컬러","#아트"],
-    taste:["네온이나 컬러 조명 포인트","블랙 배경의 비비드 아트웍","메탈 프레임 소품","가죽 소재의 가구"],
+    desc:"블랙 배경 위에 와인레드나 골드처럼 깊이 있는 컬러 하나로 포인트를 주는 걸 좋아해요. 절제와 강렬함의 대비를 즐기는 타입이에요.",
+    palette:[["#1A1A1A","블랙"],["#3A3A3A","다크그레이"],["#8B2635","와인레드"],["#C9A44A","골드"],["#4A4A4A","스틸그레이"]],
+    keywords:["#언더그라운드","#골드포인트","#와인레드","#메탈","#아트"],
+    taste:["골드 스탠드 조명이나 캔들 홀더","블랙 배경의 와인레드 아트웍","메탈 프레임 소품","가죽 소재의 가구"],
     styleRef:"<b>인더스트리얼아트st</b> 인테리어와 잘 맞아요." },
   DXNC: { title:"빈티지 서재의 수집가", sub:"시간이 쌓인 공간을 좋아하는",
     desc:"가죽, 앤틱 가구, 빼곡한 책장처럼 시간이 느껴지는 것들을 모으는 타입이에요. 새것보다 이야기가 담긴 물건에 마음이 가요.",
@@ -532,16 +491,16 @@ const TYPES = {
     taste:["패턴이 강한 러그와 패브릭","이국적인 느낌의 소품들","어두운 배경과 비비드 텍스타일의 조합","빈티지한 조명 소품"],
     styleRef:"<b>에스닉보헤미안st</b> 인테리어와 잘 맞아요." },
   DXIC: { title:"다크 로프트 헌터", sub:"묵직한 무게감을 즐기는",
-    desc:"가죽과 메탈, 브라스 소재로 이루어진 어두운 톤의 공간을 좋아해요. 무게감 있는 소재들을 하나씩 찾아 모으는 재미를 아는 타입이에요.",
-    palette:[["#1E1E1E","블랙"],["#383838","다크그레이"],["#565656","그레이"],["#767676","라이트그레이"],["#8B7355","브라스"]],
+    desc:"가죽과 브라스, 짙은 브라운 톤이 만드는 묵직한 공간을 좋아해요. 차가운 무채색보다 시간이 밴 듯한 따뜻한 무게감에 끌리는 타입이에요.",
+    palette:[["#1E1A16","다크브라운"],["#3D3128","에스프레소"],["#5C4A38","가죽브라운"],["#8B7355","브라스"],["#4A4642","스틸그레이"]],
     keywords:["#다크로프트","#브라스","#가죽","#수집오브제","#무게감"],
-    taste:["가죽과 메탈이 섞인 가구","브라스 소재 소품들","어두운 배경의 갤러리월","무게감 있는 두꺼운 텍스타일"],
+    taste:["가죽과 브라스가 섞인 가구","짙은 브라운 톤의 소품들","어두운 배경의 갤러리월","무게감 있는 두꺼운 텍스타일"],
     styleRef:"<b>다크로프트st</b> 인테리어와 잘 맞아요." },
   DXIV: { title:"맥시멀 펑크 아티스트", sub:"규칙 없이 자유로운 컬러 폭발",
-    desc:"블랙 배경 위에 원색 가구와 그래픽 아트웍을 마음대로 쌓아 올리는 타입이에요. 정해진 스타일보다 그때그때의 직감을 믿어요.",
-    palette:[["#181818","블랙"],["#E8412E","레드"],["#F2B807","옐로우"],["#2E86AB","블루"],["#6B6B6B","그레이"]],
-    keywords:["#맥시멀","#펑크무드","#컬러폭발","#그래픽","#자유로움"],
-    taste:["그래픽 아트웍이 가득한 벽","원색 가구와 소품의 자유로운 믹스","네온사인이나 강렬한 조명","빈티지와 모던을 섞은 소품들"],
+    desc:"블랙 배경 위에 그래피티처럼 여러 원색을 마음대로 쌓아 올리는 타입이에요. 정해진 스타일보다 그때그때의 직감을 믿어요.",
+    palette:[["#141414","블랙"],["#E8412E","레드"],["#2E9E5B","네온그린"],["#C93FA0","마젠타"],["#2E86AB","블루"]],
+    keywords:["#맥시멀","#펑크무드","#그래피티","#멀티컬러","#자유로움"],
+    taste:["그래피티풍 아트웍이 가득한 벽","형광·원색 가구와 소품의 자유로운 믹스","네온사인이나 강렬한 조명","빈티지와 모던을 섞은 소품들"],
     styleRef:"<b>맥시멀펑크st</b> 인테리어와 잘 맞아요." }
 };
 
@@ -694,8 +653,6 @@ function showResult() {
 function renderResult(pctByAxis) {
   const code = typeCodeFromPct(pctByAxis);
   const type = TYPES[code];
-  const compatCode = (code[0] === 'L' ? 'D' : 'L') + code.slice(1);
-  const compatType = TYPES[compatCode];
 
   document.getElementById('typeCode').textContent = code;
   document.getElementById('resultTitle').textContent = type.title;
@@ -750,9 +707,6 @@ function renderResult(pctByAxis) {
   });
 
   document.getElementById('styleRef').innerHTML = type.styleRef;
-  document.getElementById('compatTitle').textContent = compatType.title;
-  document.getElementById('compatDesc').textContent =
-    '톤은 정반대지만 밀도·재질·무드 취향은 완전히 통하는 타입이에요. 함께 공간을 꾸민다면 대비가 근사한 조화를 만들어낼 거예요.';
 }
 
 function shareResult() {
