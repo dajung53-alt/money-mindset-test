@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>홈 페르소나 | 인테리어 취향 테스트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Space+Grotesk:wght@500;700&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #FAF7F2;
+    --bg-2: #F1EAE0;
+    --card: #FFFFFF;
+    --ink: #2B2620;
+    --ink-dim: #5C5347;
+    --ink-faint: #9C9186;
+    --accent: #C1694A;
+    --accent-dim: #D98F72;
+    --sage: #6B7F5E;
+    --line: rgba(43,38,32,0.1);
+    --radius: 18px;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
+    background: radial-gradient(ellipse at top, rgba(193,105,74,0.1), transparent 55%), var(--bg);
+  }
+  .stage {
+    max-width: 460px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 44px 20px 64px;
+    display: flex;
+    flex-direction: column;
+  }
+  .eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .screen { display: none; flex: 1; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ── INTRO ── */
+  #intro { justify-content: center; align-items: center; gap: 22px; text-align: center; }
+  #intro h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 27px;
+    line-height: 1.45;
+  }
+  .sub { color: var(--ink-dim); font-size: 15px; line-height: 1.75; max-width: 340px; }
+  .meta-row {
+    display: flex; justify-content: center; gap: 18px;
+    font-size: 12px; color: var(--ink-faint);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .meta-row span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent-dim); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 600; font-size: 16px;
+    padding: 16px 28px; border-radius: 999px;
+    border: none; cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    width: 100%;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #FFFFFF; }
+  .btn-ghost { background: transparent; color: var(--ink-dim); border: 1px solid var(--line); }
+
+  /* ── QUIZ ── */
+  #quiz { gap: 20px; }
+  .progress-row { display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.35s ease; }
+  .progress-num { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--ink-faint); white-space: nowrap; }
+  .category-tag { align-self: center; font-size: 12px; letter-spacing: 0.08em; color: var(--sage); font-family: 'Space Grotesk', sans-serif; }
+  .question-text {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 20px; line-height: 1.65;
+    text-align: center; padding: 8px 4px;
+    min-height: 70px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .choices { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
+  .choice {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    text-align: left;
+    color: var(--ink);
+    font-size: 15px; line-height: 1.6;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    font-family: 'Pretendard', sans-serif;
+    width: 100%;
+    box-shadow: 0 1px 8px rgba(43,38,32,0.06);
+  }
+  .choice:hover { border-color: var(--accent); box-shadow: 0 2px 14px rgba(193,105,74,0.15); }
+  .choice:active { transform: scale(0.985); }
+  .choice-letter { font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: var(--accent); display: block; margin-bottom: 6px; letter-spacing: 0.1em; }
+  .back-link {
+    text-align: center; font-size: 13px; color: var(--ink-faint);
+    background: none; border: none; cursor: pointer; padding: 8px;
+    font-family: 'Pretendard', sans-serif;
+  }
+
+  /* ── RESULT ── */
+  #result { gap: 16px; }
+  .result-hero {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 30px 24px 26px;
+    text-align: center;
+    box-shadow: 0 2px 16px rgba(43,38,32,0.07);
+  }
+  .type-code {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; letter-spacing: 0.15em;
+    color: var(--ink-faint);
+  }
+  .result-title {
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 23px; color: var(--accent);
+    line-height: 1.45;
+    margin: 8px 0 6px;
+  }
+  .result-sub { font-size: 14px; color: var(--ink-faint); margin-bottom: 16px; }
+  .result-desc { font-size: 14px; color: var(--ink-dim); line-height: 1.8; text-align: left; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 24px 22px;
+    box-shadow: 0 2px 16px rgba(43,38,32,0.07);
+  }
+  .card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* spectrum bars */
+  .spec-item { margin-bottom: 18px; }
+  .spec-item:last-child { margin-bottom: 0; }
+  .spec-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-faint); margin-bottom: 8px; }
+  .spec-labels .active-pole { color: var(--ink); font-weight: 600; }
+  .spec-track { position: relative; height: 6px; border-radius: 6px; background: var(--bg-2); }
+  .spec-dot {
+    position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--card);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 1px 4px rgba(43,38,32,0.25);
+    transition: left 0.8s cubic-bezier(.25,.8,.25,1);
+  }
+
+  /* palette */
+  .palette-row { display: flex; gap: 8px; }
+  .swatch { flex: 1; text-align: center; }
+  .swatch-color { width: 100%; padding-top: 100%; border-radius: 12px; border: 1px solid var(--line); position: relative; }
+  .swatch-name { font-size: 10.5px; color: var(--ink-faint); margin-top: 6px; line-height: 1.4; }
+
+  /* tags */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag-chip {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12.5px; color: var(--sage);
+    background: rgba(107,127,94,0.1);
+    border-radius: 999px; padding: 6px 12px;
+  }
+
+  .taste-list { list-style: none; }
+  .taste-list li {
+    font-size: 13.5px; color: var(--ink-dim); line-height: 1.7;
+    padding-left: 16px; position: relative; margin-bottom: 8px;
+  }
+  .taste-list li:last-child { margin-bottom: 0; }
+  .taste-list li::before {
+    content: ''; position: absolute; left: 0; top: 8px;
+    width: 5px; height: 5px; border-radius: 50%; background: var(--accent-dim);
+  }
+
+  .style-ref { font-size: 13.5px; color: var(--ink-dim); line-height: 1.7; }
+  .style-ref b { color: var(--accent); font-weight: 600; }
+
+  .compat-title { font-family: 'Noto Serif KR', serif; font-weight: 700; font-size: 16px; color: var(--ink); margin-bottom: 6px; }
+  .compat-desc { font-size: 13.5px; color: var(--ink-dim); line-height: 1.7; }
+
+  .cta-row { display: flex; flex-direction: column; gap: 10px; }
+  .source-note { font-size: 11.5px; color: var(--ink-faint); line-height: 1.65; padding: 0 8px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- INTRO -->
+  <div class="screen active" id="intro">
+    <div class="eyebrow">Home Persona Test</div>
+    <h1>내가 진짜 원하는 집은<br>어떤 모습일까?</h1>
+    <div style="display:flex; justify-content:center; margin: 4px 0;">
+      <svg width="160" height="140" viewBox="0 0 160 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="80" cy="126" rx="58" ry="8" fill="#C1694A" opacity="0.12"/>
+        <path d="M28 62 L80 24 L132 62" stroke="#C1694A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <rect x="38" y="60" width="84" height="58" rx="4" fill="#F1EAE0" stroke="#D98F72" stroke-width="2.5"/>
+        <rect x="58" y="80" width="22" height="22" rx="2" fill="#FFFFFF" stroke="#6B7F5E" stroke-width="2"/>
+        <line x1="69" y1="80" x2="69" y2="102" stroke="#6B7F5E" stroke-width="1.5"/>
+        <line x1="58" y1="91" x2="80" y2="91" stroke="#6B7F5E" stroke-width="1.5"/>
+        <rect x="92" y="86" width="16" height="32" rx="2" fill="#C1694A" opacity="0.85"/>
+        <circle cx="103" cy="102" r="1.6" fill="#FAF7F2"/>
+        <circle cx="140" cy="40" r="10" fill="#D98F72" opacity="0.5"/>
+        <circle cx="20" cy="48" r="6" fill="#6B7F5E" opacity="0.4"/>
+      </svg>
+    </div>
+    <p class="sub">18개의 질문으로 알아보는<br>나의 진짜 공간 취향</p>
+    <div class="meta-row">
+      <span><span class="dot"></span>18문항</span>
+      <span><span class="dot"></span>약 3분</span>
+      <span><span class="dot"></span>4개 축</span>
+    </div>
+    <button class="btn btn-primary" onclick="startQuiz()">테스트 시작하기</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="quiz">
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-num" id="progressNum">1 / 18</div>
+    </div>
+    <div class="category-tag" id="categoryTag"></div>
+    <div class="question-text" id="questionText"></div>
+    <div class="choices" id="choices"></div>
+    <button class="back-link" id="backBtn" onclick="goBack()">← 이전 질문</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="result">
+    <div class="result-hero">
+      <div class="eyebrow">당신의 홈 페르소나</div>
+      <div class="type-code" id="typeCode"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="result-desc" id="resultDesc"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">취향 스펙트럼</div>
+      <div id="specBreakdown"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">컬러 팔레트</div>
+      <div class="palette-row" id="paletteRow"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">분위기 키워드</div>
+      <div class="tag-row" id="tagRow"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">이런 취향일 확률 높아요</div>
+      <ul class="taste-list" id="tasteList"></ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">잘 어울리는 스타일</div>
+      <div class="style-ref" id="styleRef"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">궁합이 좋은 타입</div>
+      <div class="compat-title" id="compatTitle"></div>
+      <div class="compat-desc" id="compatDesc"></div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" id="retakeBtn" onclick="location.reload()">다시 테스트하기</button>
+      <button class="btn btn-ghost" id="shareBtn" onclick="shareResult()">결과 공유하기</button>
+    </div>
+    <p class="source-note">이 테스트는 톤·밀도·재질·무드 4가지 축으로 공간 취향을 재미있게 분석해보는 자체 제작 콘텐츠입니다.</p>
+  </div>
+
+</div>
+<script>
+const AXES = {
+  tone:     { label: "톤",   neg: "라이트", pos: "다크",        negLetter: "L", posLetter: "D" },
+  density:  { label: "밀도", neg: "미니멀", pos: "맥시멀",      negLetter: "M", posLetter: "X" },
+  material: { label: "재질", neg: "내추럴", pos: "인더스트리얼", negLetter: "N", posLetter: "I" },
+  mood:     { label: "무드", neg: "차분",   pos: "비비드",      negLetter: "C", posLetter: "V" }
+};
+const AXIS_ORDER = ["tone", "density", "material", "mood"];
+
+const QUESTIONS = [
+  { axis:"tone", q:"이사 가고 싶은 집의 벽 컬러는?", options:[
+    {text:"화이트·아이보리", score:-2}, {text:"라이트 그레이·베이지", score:-1},
+    {text:"그레이지·그레이브라운", score:1}, {text:"차콜·딥그린·네이비", score:2}] },
+  { axis:"density", q:"선반 위에는 보통?", options:[
+    {text:"아무것도 없는 게 좋다", score:-2}, {text:"화분 한두 개 정도", score:-1},
+    {text:"좋아하는 소품 여러 개", score:1}, {text:"책·소품·액자로 가득", score:2}] },
+  { axis:"material", q:"가장 끌리는 가구 소재는?", options:[
+    {text:"우드·원목", score:-2}, {text:"패브릭·리넨", score:-1},
+    {text:"메탈·스틸", score:1}, {text:"콘크리트·유리", score:2}] },
+  { axis:"mood", q:"쿠션 컬러를 고른다면?", options:[
+    {text:"뉴트럴 베이지·그레이", score:-2}, {text:"톤다운 그린·브라운", score:-1},
+    {text:"컬러 포인트 하나", score:1}, {text:"원색·패턴 믹스매치", score:2}] },
+
+  { axis:"tone", q:"좋아하는 침구 톤은?", options:[
+    {text:"화이트 리넨", score:-2}, {text:"크림·오트밀", score:-1},
+    {text:"그레이·카키", score:1}, {text:"블랙·버건디", score:2}] },
+  { axis:"density", q:"옷장을 연다면?", options:[
+    {text:"옷 몇 벌만 걸린 미니멀 옷장", score:-2}, {text:"계절별로 정리된 적당한 양", score:-1},
+    {text:"다양한 스타일의 많은 옷", score:1}, {text:"옷과 소품이 넘치는 옷장", score:2}] },
+  { axis:"material", q:"화분을 고른다면 어떤 스타일?", options:[
+    {text:"라탄·우드 화분", score:-2}, {text:"세라믹 화분", score:-1},
+    {text:"시멘트 화분", score:1}, {text:"메탈·블랙 화분", score:2}] },
+  { axis:"mood", q:"좋아하는 패턴은?", options:[
+    {text:"무지(민무늬)", score:-2}, {text:"잔잔한 스트라이프", score:-1},
+    {text:"큼직한 패턴", score:1}, {text:"화려한 컬러 패턴", score:2}] },
+
+  { axis:"tone", q:"이상적인 거실 조명 분위기는?", options:[
+    {text:"화사한 자연광 가득", score:-2}, {text:"밝은 화이트 조명", score:-1},
+    {text:"은은한 무드등", score:1}, {text:"어둡고 그림자 있는 포인트 조명", score:2}] },
+  { axis:"density", q:"벽에는 무엇을 걸고 싶나요?", options:[
+    {text:"아무것도 걸지 않은 깨끗한 벽", score:-2}, {text:"심플한 액자 하나", score:-1},
+    {text:"갤러리월처럼 여러 장의 사진", score:1}, {text:"포스터·소품·조명까지 빼곡하게", score:2}] },
+  { axis:"material", q:"조명 스탠드를 고른다면?", options:[
+    {text:"우드 스탠드 조명", score:-2}, {text:"패브릭 갓 조명", score:-1},
+    {text:"메탈 프레임 조명", score:1}, {text:"콘크리트·산업용 조명", score:2}] },
+  { axis:"mood", q:"커튼 색상으로 고른다면?", options:[
+    {text:"화이트·리넨", score:-2}, {text:"그레이·베이지", score:-1},
+    {text:"머스타드·딥그린", score:1}, {text:"레드·블루 등 원색", score:2}] },
+
+  { axis:"tone", q:"선호하는 바닥재는?", options:[
+    {text:"화이트 타일", score:-2}, {text:"라이트 오크 원목", score:-1},
+    {text:"다크 오크 원목", score:1}, {text:"블랙 폴리싱 콘크리트", score:2}] },
+  { axis:"density", q:"테이블 위 스타일은?", options:[
+    {text:"노트북 하나만", score:-2}, {text:"스탠드와 컵 정도", score:-1},
+    {text:"캔들·화분·소품들", score:1}, {text:"온갖 소품으로 꾸며진 테이블", score:2}] },
+  { axis:"material", q:"선호하는 문·가구 손잡이는?", options:[
+    {text:"우드 손잡이", score:-2}, {text:"황동·골드 손잡이", score:-1},
+    {text:"스테인리스 손잡이", score:1}, {text:"블랙 스틸 파이프 손잡이", score:2}] },
+  { axis:"mood", q:"벽에 걸 그림을 고른다면?", options:[
+    {text:"흑백 사진", score:-2}, {text:"톤온톤 추상화", score:-1},
+    {text:"컬러감 있는 일러스트", score:1}, {text:"팝아트·비비드 컬러 작품", score:2}] },
+
+  { axis:"tone", q:"주방 가구 컬러로 고른다면?", options:[
+    {text:"화이트", score:-2}, {text:"우드톤 내추럴", score:-1},
+    {text:"그레이", score:1}, {text:"블랙·차콜", score:2}] },
+  { axis:"density", q:"여행 기념품에 대한 나는?", options:[
+    {text:"사진만 찍고 사지 않는다", score:-2}, {text:"작은 것 하나 정도만", score:-1},
+    {text:"눈에 띄는 곳에 진열한다", score:1}, {text:"방 곳곳에 컬렉션처럼 전시한다", score:2}] }
+];
+
+const TYPES = {
+  LMNC: { title:"조용한 볕의 미니멀리스트", sub:"비워야 채워지는 사람",
+    desc:"군더더기 없는 화이트와 우드, 은은한 자연광이 있으면 그걸로 충분한 타입이에요. 물건보다 여백이 주는 안정감을 더 좋아해요.",
+    palette:[["#FAF8F4","오프화이트"],["#E8E1D3","리넨베이지"],["#C9B79C","라이트오크"],["#A8998A","그레이베이지"],["#6B5D4F","다크우드"]],
+    keywords:["#화이트오크","#오픈셀빙","#린넨","#자연광","#무소음"],
+    taste:["리넨 커튼과 오크 원목 가구","라탄 소재의 심플한 소품","화이트·아이보리 톤의 도자기 그릇","꼭 필요한 것만 남긴 정돈된 책상"],
+    styleRef:"<b>무인양품st</b>, <b>스칸디내추럴st</b> 인테리어와 잘 맞아요." },
+  LMNV: { title:"산뜻한 내추럴 무드메이커", sub:"자연스럽지만 심심하진 않은",
+    desc:"내추럴한 우드와 리넨을 베이스로 두되, 머스타드나 테라코타 같은 컬러 포인트로 생기를 더하는 타입이에요. 과하지 않은 선에서 개성을 드러내요.",
+    palette:[["#FBF7EF","오프화이트"],["#DCE8D8","민트그린"],["#E8C55A","머스타드"],["#C97B5A","테라코타"],["#7A9B76","세이지그린"]],
+    keywords:["#내추럴포인트","#머스타드","#세이지그린","#라탄","#플랜테리어"],
+    taste:["컬러감 있는 패브릭 쿠션 한두 개","원목 가구와 원색 소품의 조합","라탄 소재에 컬러를 더한 조명","곳곳에 놓인 초록 식물"],
+    styleRef:"<b>스칸디팝st</b> 인테리어와 잘 맞아요." },
+  LMIC: { title:"화이트 큐브 미니멀리스트", sub:"갤러리처럼 정제된 공간",
+    desc:"화이트와 콘크리트, 무채색이 주는 정제된 느낌을 좋아해요. 감정보다 형태와 비례가 만드는 조용한 세련됨에 끌리는 타입이에요.",
+    palette:[["#F5F5F3","화이트"],["#D9D9D6","라이트그레이"],["#B0B0AC","그레이"],["#7C7C78","다크그레이"],["#3A3A38","차콜블랙"]],
+    keywords:["#화이트큐브","#콘크리트","#미니멀","#무채색","#갤러리감성"],
+    taste:["질감이 살아있는 콘크리트 벽","매입등 위주의 깔끔한 조명","블랙 프레임의 미니멀 가구","무채색 텍스타일과 러그"],
+    styleRef:"<b>모던미니멀st</b>, 갤러리형 인테리어와 잘 맞아요." },
+  LMIV: { title:"라이트 스튜디오 아티스트", sub:"밝은 작업실 같은 감각",
+    desc:"화이트·콘크리트의 담백한 배경에 원색 포인트를 더하는 걸 좋아해요. 미니멀하지만 어딘가 예술가의 작업실 같은 개성이 묻어나는 타입이에요.",
+    palette:[["#F7F5F0","화이트"],["#C7C9CC","콘크리트그레이"],["#3C7CA6","블루포인트"],["#E4523A","레드포인트"],["#1C1C1C","블랙"]],
+    keywords:["#스튜디오감성","#메탈","#컬러팝","#아트웍","#오픈플랜"],
+    taste:["팝아트 느낌의 포스터 한 점","메탈 프레임의 조명이나 의자","콘크리트 배경에 놓인 원색 소품","여백이 있는 오픈된 공간 구성"],
+    styleRef:"<b>인더스트리얼팝st</b> 인테리어와 잘 맞아요." },
+  LXNC: { title:"햇살 가득한 식물집사", sub:"초록과 볕이 있으면 완벽함",
+    desc:"화분과 라탄, 원목 소품들로 공간을 채우는 걸 좋아하는 타입이에요. 많아도 자연스러운 소재로 채우면 오히려 편안함이 느껴져요.",
+    palette:[["#FAF6EC","오프화이트"],["#E4D9BF","베이지"],["#B7C99A","올리브그린"],["#8C6A4A","브라운"],["#DDEADF","라이트민트"]],
+    keywords:["#플랜테리어","#라탄","#자연광","#우드","#수집"],
+    taste:["다양한 크기의 화분들","라탄 바구니와 우드 선반 위 소품들","리넨 소재의 러그와 쿠션","곳곳에 놓인 자연광이 닿는 자리"],
+    styleRef:"<b>보태니컬st</b>, <b>어반정글st</b> 인테리어와 잘 맞아요." },
+  LXNV: { title:"코지 보태니컬 컬렉터", sub:"내 취향으로 가득 채운 방",
+    desc:"패턴과 컬러가 있는 텍스타일, 다양한 화분과 소품으로 방을 가득 채우는 걸 좋아해요. 여백보다는 이야기가 있는 공간을 선호하는 타입이에요.",
+    palette:[["#FBF3E7","오프화이트"],["#E7B65C","머스타드"],["#D96C4B","테라코타"],["#5E7D5E","그린"],["#3D2B1F","다크브라운"]],
+    keywords:["#맥시멀플랜트","#컬러믹스","#보헤미안","#패턴","#수집벽"],
+    taste:["패턴이 있는 텍스타일과 러그","화분과 액자로 채운 갤러리월","컬러풀한 빈티지 소품들","곳곳에 놓인 초록 식물들"],
+    styleRef:"<b>보헤미안st</b> 인테리어와 잘 맞아요." },
+  LXIC: { title:"화이트 로프트 큐레이터", sub:"오브제를 모으는 조용한 수집가",
+    desc:"화이트와 콘크리트를 배경으로 조각이나 오브제 소품을 수집하듯 채우는 타입이에요. 색은 절제하되 형태의 다양함을 즐겨요.",
+    palette:[["#F3F2EE","화이트"],["#C8C6BF","라이트그레이"],["#9A9691","그레이"],["#5B5751","다크그레이"],["#26241F","블랙"]],
+    keywords:["#로프트","#콘크리트","#오브제수집","#무채색맥시멀","#아트피스"],
+    taste:["다양한 조각·오브제 소품들","콘크리트와 화이트가 섞인 벽면","은은한 매입 조명","무채색 계열의 패브릭들"],
+    styleRef:"<b>로프트갤러리st</b> 인테리어와 잘 맞아요." },
+  LXIV: { title:"팝한 로프트 아티스트", sub:"자유분방하고 개성 넘치는",
+    desc:"노출 콘크리트와 메탈 소재 위에 원색 오브제와 아트웍을 자유롭게 쌓아가는 타입이에요. 정해진 규칙보다 즉흥적인 매력을 즐겨요.",
+    palette:[["#F5F1E8","오프화이트"],["#2E2E2E","블랙"],["#E0483C","레드"],["#F2C230","옐로우"],["#3A7CA5","블루"]],
+    keywords:["#팝아트","#로프트","#메탈","#컬러오브제","#자유분방"],
+    taste:["원색 포스터와 아트웍 다수","메탈과 컬러가 섞인 소품들","노출 배관이 보이는 공간","개성 강한 조명 오브제"],
+    styleRef:"<b>팝인더스트리얼st</b> 인테리어와 잘 맞아요." },
+  DMNC: { title:"고요한 다크우드 은신처", sub:"어둠 속에서 편안한 사람",
+    desc:"어두운 톤과 원목이 만드는 묵직한 안정감을 좋아해요. 화려하지 않아도 깊이 있는 공간, 나만의 은신처 같은 느낌을 추구하는 타입이에요.",
+    palette:[["#2B2621","차콜"],["#4A3C2E","다크우드"],["#6E5B44","브라운"],["#8C7B63","그레이브라운"],["#C9BBA3","베이지"]],
+    keywords:["#다크우드","#무드등","#차분함","#은신처","#저채도"],
+    taste:["은은한 무드등 여러 개","다크톤 원목 가구","차콜톤 리넨 커튼","자연 소재로 된 조명갓"],
+    styleRef:"<b>재패니즈젠st</b>, <b>다크아카데미아st</b> 인테리어와 잘 맞아요." },
+  DMNV: { title:"다크 우드 앤 컬러 포인트형", sub:"묵직함 속 반짝이는 포인트",
+    desc:"어두운 배경에 원목 가구를 두고, 버건디나 앰버 같은 컬러로 포인트를 주는 타입이에요. 절제된 공간 안에서 확실한 존재감을 즐겨요.",
+    palette:[["#2A2420","차콜"],["#5C4632","우드브라운"],["#B23A2E","버건디"],["#C98A3E","앰버"],["#7A8B5E","올리브"]],
+    keywords:["#다크앤웜","#컬러포인트","#우드","#무드감","#대비"],
+    taste:["어두운 배경과 원목 가구의 조합","버건디·앰버 톤의 텍스타일 포인트","브라스 소재 소품","은은한 캔들 조명"],
+    styleRef:"<b>모던다크우드st</b> 인테리어와 잘 맞아요." },
+  DMIC: { title:"블랙 스틸 미니멀리스트", sub:"날카롭고 정제된 감각",
+    desc:"블랙과 스틸이 만드는 샤프한 무채색 공간을 좋아해요. 장식은 최소화하되 소재 자체의 존재감으로 완성도를 높이는 타입이에요.",
+    palette:[["#1C1C1C","블랙"],["#3A3A3A","다크그레이"],["#5C5C5C","그레이"],["#7E7E7E","라이트그레이"],["#A0A0A0","실버그레이"]],
+    keywords:["#올블랙","#스틸","#미니멀","#무채색","#샤프함"],
+    taste:["블랙 스틸 소재의 가구","매트한 무채색 소품","미니멀한 라인 조명","콘크리트 질감의 바닥재"],
+    styleRef:"<b>모던블랙st</b> 인테리어와 잘 맞아요." },
+  DMIV: { title:"언더그라운드 갤러리형", sub:"어둠 속 강렬한 컬러 한 점",
+    desc:"블랙 배경 위에 비비드한 컬러 아트웍이나 조명을 포인트로 두는 걸 좋아해요. 절제와 강렬함의 대비를 즐기는 타입이에요.",
+    palette:[["#1A1A1A","블랙"],["#333333","다크그레이"],["#E63946","레드"],["#4C7A96","블루그레이"],["#C9A44A","골드"]],
+    keywords:["#언더그라운드","#네온포인트","#메탈","#대비컬러","#아트"],
+    taste:["네온이나 컬러 조명 포인트","블랙 배경의 비비드 아트웍","메탈 프레임 소품","가죽 소재의 가구"],
+    styleRef:"<b>인더스트리얼아트st</b> 인테리어와 잘 맞아요." },
+  DXNC: { title:"빈티지 서재의 수집가", sub:"시간이 쌓인 공간을 좋아하는",
+    desc:"가죽, 앤틱 가구, 빼곡한 책장처럼 시간이 느껴지는 것들을 모으는 타입이에요. 새것보다 이야기가 담긴 물건에 마음이 가요.",
+    palette:[["#2E2822","다크브라운"],["#5A4632","브라운"],["#7C6A4E","카키브라운"],["#9C8A62","올리브베이지"],["#C4B48E","베이지"]],
+    keywords:["#빈티지","#서재","#가죽","#앤틱","#수집"],
+    taste:["가죽 소파와 앤틱 가구","빼곡하게 채운 책장","브라스 소재의 스탠드 조명","오래된 듯한 러그와 패브릭"],
+    styleRef:"<b>빈티지라이브러리st</b> 인테리어와 잘 맞아요." },
+  DXNV: { title:"이국적인 무드 컬렉터", sub:"어디서도 못 본 나만의 방",
+    desc:"어두운 톤 위에 이국적인 패턴과 컬러풀한 텍스타일을 겹겹이 쌓는 타입이에요. 평범함보다 개성 있는 조합을 찾는 걸 즐겨요.",
+    palette:[["#2B231D","다크브라운"],["#6B3A2E","테라코타다크"],["#B2622E","오렌지브라운"],["#6E7A4A","올리브"],["#C9973E","머스타드"]],
+    keywords:["#에스닉","#이국적무드","#패턴","#컬러풀빈티지","#수집벽"],
+    taste:["패턴이 강한 러그와 패브릭","이국적인 느낌의 소품들","어두운 배경과 비비드 텍스타일의 조합","빈티지한 조명 소품"],
+    styleRef:"<b>에스닉보헤미안st</b> 인테리어와 잘 맞아요." },
+  DXIC: { title:"다크 로프트 헌터", sub:"묵직한 무게감을 즐기는",
+    desc:"가죽과 메탈, 브라스 소재로 이루어진 어두운 톤의 공간을 좋아해요. 무게감 있는 소재들을 하나씩 찾아 모으는 재미를 아는 타입이에요.",
+    palette:[["#1E1E1E","블랙"],["#383838","다크그레이"],["#565656","그레이"],["#767676","라이트그레이"],["#8B7355","브라스"]],
+    keywords:["#다크로프트","#브라스","#가죽","#수집오브제","#무게감"],
+    taste:["가죽과 메탈이 섞인 가구","브라스 소재 소품들","어두운 배경의 갤러리월","무게감 있는 두꺼운 텍스타일"],
+    styleRef:"<b>다크로프트st</b> 인테리어와 잘 맞아요." },
+  DXIV: { title:"맥시멀 펑크 아티스트", sub:"규칙 없이 자유로운 컬러 폭발",
+    desc:"블랙 배경 위에 원색 가구와 그래픽 아트웍을 마음대로 쌓아 올리는 타입이에요. 정해진 스타일보다 그때그때의 직감을 믿어요.",
+    palette:[["#181818","블랙"],["#E8412E","레드"],["#F2B807","옐로우"],["#2E86AB","블루"],["#6B6B6B","그레이"]],
+    keywords:["#맥시멀","#펑크무드","#컬러폭발","#그래픽","#자유로움"],
+    taste:["그래픽 아트웍이 가득한 벽","원색 가구와 소품의 자유로운 믹스","네온사인이나 강렬한 조명","빈티지와 모던을 섞은 소품들"],
+    styleRef:"<b>맥시멀펑크st</b> 인테리어와 잘 맞아요." }
+};
+
+let scores = { tone:0, density:0, material:0, mood:0 };
+let current = 0;
+let history = [];
+
+window.addEventListener('DOMContentLoaded', function() {
+  const hash = window.location.hash;
+  if (hash && hash.startsWith('#result=')) {
+    const parts = hash.replace('#result=', '').split(',').map(Number);
+    if (parts.length === 4 && parts.every(p => !isNaN(p) && p >= 0 && p <= 100)) {
+      document.getElementById('intro').classList.remove('active');
+      document.getElementById('result').classList.add('active');
+      const pctByAxis = { tone: parts[0], density: parts[1], material: parts[2], mood: parts[3] };
+      renderResult(pctByAxis);
+      document.getElementById('shareBtn').style.display = 'none';
+      const retakeBtn = document.getElementById('retakeBtn');
+      retakeBtn.textContent = '나도 테스트하기';
+      retakeBtn.onclick = function() { window.location.href = window.location.pathname; };
+    }
+  }
+});
+
+function startQuiz() {
+  scores = { tone:0, density:0, material:0, mood:0 };
+  current = 0;
+  history = [];
+  document.getElementById('intro').classList.remove('active');
+  document.getElementById('quiz').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  const axis = AXES[q.axis];
+  document.getElementById('categoryTag').textContent = axis.label + ' · ' + axis.neg + ' ↔ ' + axis.pos;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('progressFill').style.width = (current / QUESTIONS.length * 100) + '%';
+  document.getElementById('progressNum').textContent = (current + 1) + ' / ' + QUESTIONS.length;
+  document.getElementById('backBtn').style.visibility = current === 0 ? 'hidden' : 'visible';
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  q.options.forEach(function(opt, i) {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.onclick = function() { answer(i); };
+    btn.innerHTML = '<span class="choice-letter">' + String.fromCharCode(65 + i) + '</span><span>' + opt.text + '</span>';
+    choicesEl.appendChild(btn);
+  });
+}
+
+function answer(optionIndex) {
+  const q = QUESTIONS[current];
+  const opt = q.options[optionIndex];
+  scores[q.axis] += opt.score;
+  history.push({ axis: q.axis, score: opt.score });
+  current++;
+  if (current >= QUESTIONS.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function goBack() {
+  if (current === 0) return;
+  current--;
+  const h = history.pop();
+  scores[h.axis] -= h.score;
+  renderQuestion();
+}
+
+function axisMax(axisKey) {
+  return QUESTIONS.filter(q => q.axis === axisKey).length * 2;
+}
+
+function computePctByAxis() {
+  const result = {};
+  AXIS_ORDER.forEach(function(axisKey) {
+    const max = axisMax(axisKey);
+    const min = -max;
+    result[axisKey] = Math.round(((scores[axisKey] - min) / (max - min)) * 100);
+  });
+  return result;
+}
+
+function typeCodeFromPct(pctByAxis) {
+  return AXIS_ORDER.map(function(axisKey) {
+    const axis = AXES[axisKey];
+    return pctByAxis[axisKey] >= 50 ? axis.posLetter : axis.negLetter;
+  }).join('');
+}
+
+function showResult() {
+  document.getElementById('quiz').classList.remove('active');
+  document.getElementById('result').classList.add('active');
+  const pctByAxis = computePctByAxis();
+  try {
+    window.history.replaceState(null, null, '#result=' + AXIS_ORDER.map(a => pctByAxis[a]).join(','));
+  } catch (e) {}
+  renderResult(pctByAxis);
+}
+
+function renderResult(pctByAxis) {
+  const code = typeCodeFromPct(pctByAxis);
+  const type = TYPES[code];
+  const compatCode = (code[0] === 'L' ? 'D' : 'L') + code.slice(1);
+  const compatType = TYPES[compatCode];
+
+  document.getElementById('typeCode').textContent = code;
+  document.getElementById('resultTitle').textContent = type.title;
+  document.getElementById('resultSub').textContent = type.sub;
+  document.getElementById('resultDesc').textContent = type.desc;
+
+  const specEl = document.getElementById('specBreakdown');
+  specEl.innerHTML = '';
+  AXIS_ORDER.forEach(function(axisKey) {
+    const axis = AXES[axisKey];
+    const pct = pctByAxis[axisKey];
+    const item = document.createElement('div');
+    item.className = 'spec-item';
+    item.innerHTML =
+      '<div class="spec-labels">' +
+        '<span class="' + (pct < 50 ? 'active-pole' : '') + '">' + axis.neg + '</span>' +
+        '<span class="' + (pct >= 50 ? 'active-pole' : '') + '">' + axis.pos + '</span>' +
+      '</div>' +
+      '<div class="spec-track"><div class="spec-dot" style="left:0%" data-target="' + pct + '"></div></div>';
+    specEl.appendChild(item);
+  });
+  setTimeout(function() {
+    document.querySelectorAll('.spec-dot').forEach(function(dot) {
+      dot.style.left = dot.dataset.target + '%';
+    });
+  }, 120);
+
+  const paletteEl = document.getElementById('paletteRow');
+  paletteEl.innerHTML = '';
+  type.palette.forEach(function(c) {
+    const sw = document.createElement('div');
+    sw.className = 'swatch';
+    sw.innerHTML = '<div class="swatch-color" style="background:' + c[0] + '"></div><div class="swatch-name">' + c[1] + '</div>';
+    paletteEl.appendChild(sw);
+  });
+
+  const tagEl = document.getElementById('tagRow');
+  tagEl.innerHTML = '';
+  type.keywords.forEach(function(k) {
+    const chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.textContent = k;
+    tagEl.appendChild(chip);
+  });
+
+  const tasteEl = document.getElementById('tasteList');
+  tasteEl.innerHTML = '';
+  type.taste.forEach(function(t) {
+    const li = document.createElement('li');
+    li.textContent = t;
+    tasteEl.appendChild(li);
+  });
+
+  document.getElementById('styleRef').innerHTML = type.styleRef;
+  document.getElementById('compatTitle').textContent = compatType.title;
+  document.getElementById('compatDesc').textContent =
+    '톤은 정반대지만 밀도·재질·무드 취향은 완전히 통하는 타입이에요. 함께 공간을 꾸민다면 대비가 근사한 조화를 만들어낼 거예요.';
+}
+
+function shareResult() {
+  const title = document.getElementById('resultTitle').textContent;
+  const sub = document.getElementById('resultSub').textContent;
+  const url = window.location.origin + window.location.pathname + window.location.hash;
+  const text = '나의 홈 페르소나는?\n"' + title + '" — ' + sub + '\n\n나도 테스트해보기 👉 ' + url;
+  if (navigator.share) {
+    navigator.share({ title: '홈 페르소나 테스트', text: text, url: url });
+  } else {
+    navigator.clipboard.writeText(text).then(function() {
+      alert('결과가 클립보드에 복사됐어요! 원하는 곳에 붙여넣기 하세요.');
+    }).catch(function() {
+      prompt('아래 텍스트를 복사해서 공유하세요:', text);
+    });
+  }
+}
+</script>
+</body>
+</html>
