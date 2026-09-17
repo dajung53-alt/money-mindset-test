@@ -101,7 +101,7 @@
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 16px 20px;
+    padding: 12px 18px;
     text-align: left;
     color: var(--ink);
     font-size: 15px; line-height: 1.6;
@@ -110,10 +110,45 @@
     font-family: 'Pretendard', sans-serif;
     width: 100%;
     box-shadow: 0 1px 8px rgba(43,38,32,0.06);
+    display: flex; align-items: center; gap: 14px;
   }
   .choice:hover { border-color: var(--accent); box-shadow: 0 2px 14px rgba(193,105,74,0.15); }
   .choice:active { transform: scale(0.985); }
-  .choice-letter { font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: var(--accent); display: block; margin-bottom: 6px; letter-spacing: 0.1em; }
+  .choice-body { display: flex; flex-direction: column; min-width: 0; }
+  .choice-letter { font-family: 'Space Grotesk', sans-serif; font-size: 11px; color: var(--accent); display: block; margin-bottom: 4px; letter-spacing: 0.1em; }
+
+  /* option visual chip */
+  .opt-visual { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; border: 1px solid var(--line); overflow: hidden; }
+
+  .density-visual { display: flex; align-items: flex-end; justify-content: center; gap: 3px; background: var(--bg-2); }
+  .density-bar { width: 6px; border-radius: 2px; background: var(--line); }
+  .density-bar:nth-child(1) { height: 9px; }
+  .density-bar:nth-child(2) { height: 16px; }
+  .density-bar:nth-child(3) { height: 23px; }
+  .density-bar:nth-child(4) { height: 30px; }
+  .density-bar.filled { background: var(--accent); }
+
+  .mat-wood      { background: repeating-linear-gradient(100deg, #C9A177 0 6px, #B8895F 6px 8px); }
+  .mat-rattan    { background: repeating-linear-gradient(60deg, #D2A968 0 4px, #B98F4E 4px 7px); }
+  .mat-fabric    { background: radial-gradient(circle at 4px 4px, rgba(43,38,32,0.12) 1px, transparent 1.5px) 0 0/8px 8px, #F1EAE0; }
+  .mat-ceramic   { background: linear-gradient(160deg, #EDEAE3, #D3CDBF); }
+  .mat-metal     { background: linear-gradient(135deg, #C7CBCE, #8B9094 45%, #EAEEF0 55%, #6E7377); }
+  .mat-cement    { background: radial-gradient(circle at 25% 35%, rgba(0,0,0,0.12) 0 1px, transparent 1px) 0 0/9px 9px, linear-gradient(#BDB9B1,#A6A29A); }
+  .mat-concrete  { background: radial-gradient(circle at 30% 30%, rgba(0,0,0,0.12) 0 1px, transparent 1px) 0 0/9px 9px, linear-gradient(#B9BEC0,#9CA1A3); }
+  .mat-brass     { background: linear-gradient(135deg, #E3C27E, #B8892B 55%, #F0D48F); }
+  .mat-steel     { background: linear-gradient(135deg, #E2E5E7, #AEB3B6); }
+  .mat-blacksteel{ background: linear-gradient(135deg, #3D3D3D, #161616 60%, #4A4A4A); }
+
+  .pat-solid    { background: #EDE6D9; }
+  .pat-stripe   { background: repeating-linear-gradient(90deg, #8C9C88 0 3px, #EDE6D9 3px 9px); }
+  .pat-bold     { background: repeating-linear-gradient(45deg, #C1694A 0 8px, #EDE6D9 8px 16px); }
+  .pat-colorful { background: conic-gradient(#E4523A, #F2C230, #3C7CA6, #6B7F5E, #E4523A); }
+
+  .art-bw           { background: linear-gradient(135deg, #3A3A3A, #D9D9D6); }
+  .art-tone         { background: linear-gradient(135deg, #B7A98C, #E8E1D3); }
+  .art-illustration { background: linear-gradient(135deg, #E8C55A, #7A9B76, #3C7CA6); }
+  .art-pop          { background: conic-gradient(#E4523A, #F2C230, #3C7CA6, #E4523A); }
+
   .back-link {
     text-align: center; font-size: 13px; color: var(--ink-faint);
     background: none; border: none; cursor: pointer; padding: 8px;
@@ -310,65 +345,105 @@ const AXES = {
 };
 const AXIS_ORDER = ["tone", "density", "material", "mood"];
 
+function densityVisual(level) {
+  return { type:"density", level: level };
+}
+
 const QUESTIONS = [
   { axis:"tone", q:"가장 끌리는 벽 컬러는?", options:[
-    {text:"화이트·아이보리", score:-2}, {text:"라이트 그레이·베이지", score:-1},
-    {text:"그레이지·그레이브라운", score:1}, {text:"차콜·딥그린·네이비", score:2}] },
+    {text:"화이트·아이보리", score:-2, visual:{type:"color", colors:["#FFFFFF","#F5EFDD"]}},
+    {text:"라이트 그레이·베이지", score:-1, visual:{type:"color", colors:["#D9D6CF","#E8DCC8"]}},
+    {text:"그레이지·그레이브라운", score:1, visual:{type:"color", colors:["#A79C8E","#8C7F6E"]}},
+    {text:"차콜·딥그린·네이비", score:2, visual:{type:"color", colors:["#2E2E2E","#1F3D2B","#1B2A44"]}}] },
   { axis:"density", q:"선반 위에는 보통?", options:[
-    {text:"아무것도 없는 게 좋다", score:-2}, {text:"화분 한두 개 정도", score:-1},
-    {text:"좋아하는 소품 여러 개", score:1}, {text:"책·소품·액자로 가득", score:2}] },
+    {text:"아무것도 없는 게 좋다", score:-2, visual:densityVisual(0)},
+    {text:"화분 한두 개 정도", score:-1, visual:densityVisual(1)},
+    {text:"좋아하는 소품 여러 개", score:1, visual:densityVisual(2)},
+    {text:"책·소품·액자로 가득", score:2, visual:densityVisual(3)}] },
   { axis:"material", q:"가장 끌리는 가구 소재는?", options:[
-    {text:"우드·원목", score:-2}, {text:"패브릭·리넨", score:-1},
-    {text:"메탈·스틸", score:1}, {text:"콘크리트·유리", score:2}] },
+    {text:"우드·원목", score:-2, visual:{type:"material", mat:"wood"}},
+    {text:"패브릭·리넨", score:-1, visual:{type:"material", mat:"fabric"}},
+    {text:"메탈·스틸", score:1, visual:{type:"material", mat:"metal"}},
+    {text:"콘크리트·유리", score:2, visual:{type:"material", mat:"concrete"}}] },
   { axis:"mood", q:"쿠션 컬러를 고른다면?", options:[
-    {text:"뉴트럴 베이지·그레이", score:-2}, {text:"톤다운 그린·브라운", score:-1},
-    {text:"컬러 포인트 하나", score:1}, {text:"원색·패턴 믹스매치", score:2}] },
+    {text:"뉴트럴 베이지·그레이", score:-2, visual:{type:"color", colors:["#E3DCCF","#B7B2A8"]}},
+    {text:"톤다운 그린·브라운", score:-1, visual:{type:"color", colors:["#6E7A5C","#7A5C3E"]}},
+    {text:"컬러 포인트 하나", score:1, visual:{type:"color", colors:["#C1694A"]}},
+    {text:"원색·패턴 믹스매치", score:2, visual:{type:"color", colors:["#E4523A","#F2C230","#3C7CA6"]}}] },
 
-  { axis:"tone", q:"좋아하는 침구 톤은?", options:[
-    {text:"화이트 리넨", score:-2}, {text:"크림·오트밀", score:-1},
-    {text:"그레이·카키", score:1}, {text:"블랙·버건디", score:2}] },
+  { axis:"tone", q:"잠자리에서 좋아하는 침구 톤은?", options:[
+    {text:"화이트", score:-2, visual:{type:"color", colors:["#FFFFFF"]}},
+    {text:"크림·오트밀", score:-1, visual:{type:"color", colors:["#F0E6D2","#E3D3B5"]}},
+    {text:"그레이·카키", score:1, visual:{type:"color", colors:["#9C9686","#8A8F6E"]}},
+    {text:"블랙·버건디", score:2, visual:{type:"color", colors:["#1C1C1C","#5A1F2A"]}}] },
   { axis:"density", q:"옷장을 연다면?", options:[
-    {text:"옷 몇 벌만 걸린 미니멀 옷장", score:-2}, {text:"계절별로 정리된 적당한 양", score:-1},
-    {text:"다양한 스타일의 많은 옷", score:1}, {text:"옷과 소품이 넘치는 옷장", score:2}] },
+    {text:"옷 몇 벌만 걸린 미니멀 옷장", score:-2, visual:densityVisual(0)},
+    {text:"계절별로 정리된 적당한 양", score:-1, visual:densityVisual(1)},
+    {text:"다양한 스타일의 많은 옷", score:1, visual:densityVisual(2)},
+    {text:"옷과 소품이 넘치는 옷장", score:2, visual:densityVisual(3)}] },
   { axis:"material", q:"화분을 고른다면 어떤 스타일?", options:[
-    {text:"라탄·우드 화분", score:-2}, {text:"세라믹 화분", score:-1},
-    {text:"시멘트 화분", score:1}, {text:"메탈·블랙 화분", score:2}] },
+    {text:"라탄·우드 화분", score:-2, visual:{type:"material", mat:"rattan"}},
+    {text:"세라믹 화분", score:-1, visual:{type:"material", mat:"ceramic"}},
+    {text:"시멘트 화분", score:1, visual:{type:"material", mat:"cement"}},
+    {text:"메탈 화분", score:2, visual:{type:"material", mat:"metal"}}] },
   { axis:"mood", q:"좋아하는 패턴은?", options:[
-    {text:"무지(민무늬)", score:-2}, {text:"잔잔한 스트라이프", score:-1},
-    {text:"큼직한 패턴", score:1}, {text:"화려한 컬러 패턴", score:2}] },
+    {text:"무지(민무늬)", score:-2, visual:{type:"pattern", style:"solid"}},
+    {text:"잔잔한 스트라이프", score:-1, visual:{type:"pattern", style:"stripe"}},
+    {text:"큼직한 패턴", score:1, visual:{type:"pattern", style:"bold"}},
+    {text:"화려한 컬러 패턴", score:2, visual:{type:"pattern", style:"colorful"}}] },
 
   { axis:"tone", q:"가장 편안하게 느끼는 거실 조명 분위기는?", options:[
-    {text:"화사한 자연광 가득", score:-2}, {text:"밝은 화이트 조명", score:-1},
-    {text:"은은한 무드등", score:1}, {text:"어둡고 그림자 있는 포인트 조명", score:2}] },
+    {text:"화사한 자연광 가득", score:-2, visual:{type:"color", colors:["#FFF6D9"]}},
+    {text:"밝은 화이트 조명", score:-1, visual:{type:"color", colors:["#F5F3EC"]}},
+    {text:"은은한 무드등", score:1, visual:{type:"color", colors:["#D9B36C"]}},
+    {text:"어둡고 그림자 있는 포인트 조명", score:2, visual:{type:"color", colors:["#2A2420"]}}] },
   { axis:"density", q:"벽에는 무엇을 걸고 싶나요?", options:[
-    {text:"아무것도 걸지 않은 깨끗한 벽", score:-2}, {text:"심플한 액자 하나", score:-1},
-    {text:"갤러리월처럼 여러 장의 사진", score:1}, {text:"포스터·소품·조명까지 빼곡하게", score:2}] },
+    {text:"아무것도 걸지 않은 깨끗한 벽", score:-2, visual:densityVisual(0)},
+    {text:"심플한 액자 하나", score:-1, visual:densityVisual(1)},
+    {text:"갤러리월처럼 여러 장의 사진", score:1, visual:densityVisual(2)},
+    {text:"포스터·소품·조명까지 빼곡하게", score:2, visual:densityVisual(3)}] },
   { axis:"material", q:"조명 스탠드를 고른다면?", options:[
-    {text:"우드 스탠드 조명", score:-2}, {text:"패브릭 갓 조명", score:-1},
-    {text:"메탈 프레임 조명", score:1}, {text:"콘크리트·산업용 조명", score:2}] },
+    {text:"우드 스탠드 조명", score:-2, visual:{type:"material", mat:"wood"}},
+    {text:"패브릭 갓 조명", score:-1, visual:{type:"material", mat:"fabric"}},
+    {text:"메탈 프레임 조명", score:1, visual:{type:"material", mat:"metal"}},
+    {text:"콘크리트·산업용 조명", score:2, visual:{type:"material", mat:"concrete"}}] },
   { axis:"mood", q:"커튼 색상으로 고른다면?", options:[
-    {text:"화이트·리넨", score:-2}, {text:"그레이·베이지", score:-1},
-    {text:"머스타드·딥그린", score:1}, {text:"레드·블루 등 원색", score:2}] },
+    {text:"화이트", score:-2, visual:{type:"color", colors:["#FFFFFF"]}},
+    {text:"그레이·베이지", score:-1, visual:{type:"color", colors:["#C9C4B8","#B9AE99"]}},
+    {text:"머스타드·딥그린", score:1, visual:{type:"color", colors:["#D9A93E","#3F5C3E"]}},
+    {text:"레드·블루 등 원색", score:2, visual:{type:"color", colors:["#D64545","#3763A8"]}}] },
 
-  { axis:"tone", q:"선호하는 바닥재는?", options:[
-    {text:"화이트 타일", score:-2}, {text:"라이트 오크 원목", score:-1},
-    {text:"다크 오크 원목", score:1}, {text:"블랙 폴리싱 콘크리트", score:2}] },
+  { axis:"tone", q:"끌리는 원목 바닥 톤은?", options:[
+    {text:"화이트 워시 오크", score:-2, visual:{type:"color", colors:["#EDE3D0"]}},
+    {text:"라이트 내추럴 오크", score:-1, visual:{type:"color", colors:["#D9BE94"]}},
+    {text:"미디엄 월넛", score:1, visual:{type:"color", colors:["#8C6A45"]}},
+    {text:"다크 에보니", score:2, visual:{type:"color", colors:["#3A2A1D"]}}] },
   { axis:"density", q:"테이블 위 스타일은?", options:[
-    {text:"노트북 하나만", score:-2}, {text:"스탠드와 컵 정도", score:-1},
-    {text:"캔들·화분·소품들", score:1}, {text:"온갖 소품으로 꾸며진 테이블", score:2}] },
+    {text:"노트북 하나만", score:-2, visual:densityVisual(0)},
+    {text:"스탠드와 컵 정도", score:-1, visual:densityVisual(1)},
+    {text:"캔들·화분·소품들", score:1, visual:densityVisual(2)},
+    {text:"온갖 소품으로 꾸며진 테이블", score:2, visual:densityVisual(3)}] },
   { axis:"material", q:"선호하는 문·가구 손잡이는?", options:[
-    {text:"우드 손잡이", score:-2}, {text:"황동·골드 손잡이", score:-1},
-    {text:"스테인리스 손잡이", score:1}, {text:"블랙 스틸 파이프 손잡이", score:2}] },
+    {text:"우드 손잡이", score:-2, visual:{type:"material", mat:"wood"}},
+    {text:"황동 손잡이", score:-1, visual:{type:"material", mat:"brass"}},
+    {text:"스테인리스 손잡이", score:1, visual:{type:"material", mat:"steel"}},
+    {text:"스틸 파이프 손잡이", score:2, visual:{type:"material", mat:"blacksteel"}}] },
   { axis:"mood", q:"벽에 걸 그림을 고른다면?", options:[
-    {text:"흑백 사진", score:-2}, {text:"톤온톤 추상화", score:-1},
-    {text:"컬러감 있는 일러스트", score:1}, {text:"팝아트·비비드 컬러 작품", score:2}] },
+    {text:"흑백 사진", score:-2, visual:{type:"art", style:"bw"}},
+    {text:"톤온톤 추상화", score:-1, visual:{type:"art", style:"tone"}},
+    {text:"컬러감 있는 일러스트", score:1, visual:{type:"art", style:"illustration"}},
+    {text:"팝아트·비비드 컬러 작품", score:2, visual:{type:"art", style:"pop"}}] },
 
-  { axis:"tone", q:"주방 가구 컬러로 고른다면?", options:[
-    {text:"화이트", score:-2}, {text:"우드톤 내추럴", score:-1},
-    {text:"그레이", score:1}, {text:"블랙·차콜", score:2}] },
+  { axis:"tone", q:"옷장에 가장 많은 옷 컬러는?", options:[
+    {text:"화이트·베이지", score:-2, visual:{type:"color", colors:["#FFFFFF","#E8DCC2"]}},
+    {text:"그레이·라이트카키", score:-1, visual:{type:"color", colors:["#B8B2A6","#A6A184"]}},
+    {text:"카키·브라운", score:1, visual:{type:"color", colors:["#7C7355","#6B4E34"]}},
+    {text:"블랙·네이비", score:2, visual:{type:"color", colors:["#1C1C1C","#1B2A44"]}}] },
   { axis:"density", q:"여행 기념품에 대한 나는?", options:[
-    {text:"사진만 찍고 사지 않는다", score:-2}, {text:"작은 것 하나 정도만", score:-1},
-    {text:"눈에 띄는 곳에 진열한다", score:1}, {text:"방 곳곳에 컬렉션처럼 전시한다", score:2}] }
+    {text:"사진만 찍고 사지 않는다", score:-2, visual:densityVisual(0)},
+    {text:"작은 것 하나 정도만", score:-1, visual:densityVisual(1)},
+    {text:"눈에 띄는 곳에 진열한다", score:1, visual:densityVisual(2)},
+    {text:"방 곳곳에 컬렉션처럼 전시한다", score:2, visual:densityVisual(3)}] }
 ];
 
 const TYPES = {
@@ -473,6 +548,49 @@ const TYPES = {
 let scores = { tone:0, density:0, material:0, mood:0 };
 let current = 0;
 let history = [];
+let shuffledOptions = [];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderVisual(v) {
+  if (!v) return '';
+  if (v.type === 'color') {
+    const colors = v.colors;
+    if (colors.length === 1) {
+      return '<div class="opt-visual" style="background:' + colors[0] + '"></div>';
+    }
+    const stops = colors.map(function(c, i) {
+      const start = (i / colors.length * 100).toFixed(1);
+      const end = ((i + 1) / colors.length * 100).toFixed(1);
+      return c + ' ' + start + '%, ' + c + ' ' + end + '%';
+    }).join(', ');
+    return '<div class="opt-visual" style="background:linear-gradient(135deg,' + stops + ')"></div>';
+  }
+  if (v.type === 'material') {
+    return '<div class="opt-visual mat-' + v.mat + '"></div>';
+  }
+  if (v.type === 'density') {
+    let bars = '';
+    for (let i = 0; i < 4; i++) {
+      bars += '<span class="density-bar' + (i <= v.level ? ' filled' : '') + '"></span>';
+    }
+    return '<div class="opt-visual density-visual">' + bars + '</div>';
+  }
+  if (v.type === 'pattern') {
+    return '<div class="opt-visual pat-' + v.style + '"></div>';
+  }
+  if (v.type === 'art') {
+    return '<div class="opt-visual art-' + v.style + '"></div>';
+  }
+  return '';
+}
 
 window.addEventListener('DOMContentLoaded', function() {
   const hash = window.location.hash;
@@ -495,6 +613,7 @@ function startQuiz() {
   scores = { tone:0, density:0, material:0, mood:0 };
   current = 0;
   history = [];
+  shuffledOptions = QUESTIONS.map(function(q) { return shuffle(q.options); });
   document.getElementById('intro').classList.remove('active');
   document.getElementById('quiz').classList.add('active');
   renderQuestion();
@@ -511,18 +630,18 @@ function renderQuestion() {
 
   const choicesEl = document.getElementById('choices');
   choicesEl.innerHTML = '';
-  q.options.forEach(function(opt, i) {
+  shuffledOptions[current].forEach(function(opt, i) {
     const btn = document.createElement('button');
     btn.className = 'choice';
-    btn.onclick = function() { answer(i); };
-    btn.innerHTML = '<span class="choice-letter">' + String.fromCharCode(65 + i) + '</span><span>' + opt.text + '</span>';
+    btn.onclick = function() { answer(opt); };
+    btn.innerHTML = renderVisual(opt.visual) +
+      '<div class="choice-body"><span class="choice-letter">' + String.fromCharCode(65 + i) + '</span><span>' + opt.text + '</span></div>';
     choicesEl.appendChild(btn);
   });
 }
 
-function answer(optionIndex) {
+function answer(opt) {
   const q = QUESTIONS[current];
-  const opt = q.options[optionIndex];
   scores[q.axis] += opt.score;
   history.push({ axis: q.axis, score: opt.score });
   current++;
